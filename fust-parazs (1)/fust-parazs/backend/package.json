@@ -1,0 +1,22 @@
+{
+  "name": "fust-parazs-backend",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Füst & Parázs – Express API + MySQL adatbázis",
+  "engines": {
+    "node": ">=22.9"
+  },
+  "scripts": {
+    "db:setup": "node --env-file-if-exists=.env setup-db.js",
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "mysql2": "^3.24.6",
+    "node": "^27.0.0-alpha.0.0.0"
+  }
+}
