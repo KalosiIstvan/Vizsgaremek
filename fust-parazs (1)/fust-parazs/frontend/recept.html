@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Receptek – Füst &amp; Parázs</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#1f5f5b; --teal-d:#143f3c; --mustard:#f0b429; --brick:#a63a26;
+  --chalk:#faf6ee; --ink:#231f1c; --paper:#fff;
+  --display:'Outfit','Georgia',serif;
+  --body:'Inter','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font-family:var(--body);background:var(--chalk);color:var(--ink);line-height:1.65;font-size:17px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--mustard);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.1}
+h2{font-size:clamp(1.7rem,4vw,2.4rem);color:var(--teal);margin-bottom:.5em}
+h3{font-size:1.2rem;margin-bottom:.4em}
+p{max-width:68ch;margin-bottom:1em}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:var(--ink);border-bottom:4px solid var(--mustard)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px;max-width:1240px}
+.logo{font-family:var(--display);font-weight:800;color:var(--mustard);text-decoration:none;font-size:1.25rem}
+nav ul{display:flex;gap:4px;list-style:none;flex-wrap:wrap}
+nav li a{display:block;color:var(--chalk);text-decoration:none;padding:6px 10px;border-radius:6px;font-weight:600;font-size:.88rem;white-space:nowrap}
+nav li a:hover,nav li a[aria-current]{background:var(--brick);color:#fff}
+
+/* hero strip */
+.page-hero{background:var(--teal);color:var(--chalk);padding:52px 0 48px;border-bottom:5px solid var(--ink)}
+.page-hero h1{font-size:clamp(2.2rem,6vw,3.8rem);color:var(--mustard);text-shadow:3px 3px 0 var(--teal-d);margin-bottom:.3em}
+.page-hero p{font-size:1.1rem;max-width:46ch;color:#d4ece9}
+
+/* filter bar */
+.filterbar{background:var(--paper);border-bottom:3px solid var(--ink);padding:14px 0;position:sticky;top:62px;z-index:10}
+.filterbar .wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font:inherit;font-weight:700;cursor:pointer;padding:8px 18px;border-radius:999px;border:3px solid var(--ink);background:var(--chalk);color:var(--ink);font-size:.88rem}
+.pill[aria-selected="true"]{background:var(--brick);color:#fff;border-color:var(--brick)}
+.pill:hover:not([aria-selected="true"]){background:var(--mustard)}
+
+/* recipe grid */
+.recipe-grid{padding:52px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:24px;margin-top:8px}
+
+/* recipe card */
+.rcard{border:3px solid var(--ink);border-radius:16px;background:var(--paper);box-shadow:6px 6px 0 var(--teal);display:flex;flex-direction:column;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.rcard:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--teal)}
+.rcard-top{background:var(--brick);padding:22px 22px 18px;color:#fff}
+.rcard-top h3{font-size:1.25rem;color:#fff;margin-bottom:.2em}
+.rcard-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.tag{display:inline-block;background:rgba(255,255,255,.18);color:#fff;border-radius:6px;padding:2px 10px;font-size:.8rem;font-weight:700;border:1.5px solid rgba(255,255,255,.35)}
+.tag.kat{background:var(--mustard);color:var(--ink);border-color:var(--mustard)}
+.rcard-body{padding:20px 22px;flex:1;display:flex;flex-direction:column;gap:14px}
+.rcard-body p{font-size:.95rem;margin:0;flex:1}
+.rcard-btn{align-self:flex-start;display:inline-block;background:var(--mustard);color:var(--ink);font-weight:700;text-decoration:none;padding:9px 20px;border-radius:999px;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:.9rem;cursor:pointer;font:inherit;transition:transform .12s,box-shadow .12s}
+.rcard-btn:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+
+/* modal overlay */
+.overlay{position:fixed;inset:0;background:rgba(35,31,28,.75);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.overlay[hidden]{display:none}
+.modal{background:var(--chalk);border:4px solid var(--ink);border-radius:20px;max-width:760px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:10px 10px 0 var(--ink);position:relative}
+.modal-head{background:var(--brick);color:#fff;padding:28px 32px 22px;border-radius:16px 16px 0 0;border-bottom:3px solid var(--ink)}
+.modal-head h2{color:#fff;margin-bottom:.2em}
+.modal-head .modal-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.modal-close{position:absolute;top:16px;right:18px;background:var(--mustard);border:3px solid var(--ink);border-radius:50%;width:40px;height:40px;font-size:1.3rem;font-weight:900;cursor:pointer;line-height:1;font-family:var(--display);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.modal-body{padding:28px 32px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.ing-list{list-style:none;margin:0}
+.ing-list li{padding:8px 0;border-bottom:2px dashed #d9d2c3;font-size:.95rem;display:flex;align-items:baseline;gap:8px}
+.ing-list li:last-child{border-bottom:0}
+.ing-list li::before{content:"•";color:var(--brick);font-weight:900;font-size:1.1rem;flex-shrink:0}
+.steps-list{list-style:none;counter-reset:steps;margin:0}
+.steps-list li{counter-increment:steps;padding:10px 0 10px 44px;border-bottom:2px solid #e8e2d8;position:relative;font-size:.95rem}
+.steps-list li:last-child{border-bottom:0}
+.steps-list li::before{content:counter(steps);position:absolute;left:0;top:10px;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;font-family:var(--display)}
+.modal-tip{background:var(--mustard);border:3px solid var(--ink);border-radius:12px;padding:16px 20px;margin-top:22px;font-size:.93rem}
+.modal-tip b{color:var(--brick)}
+.modal-section-title{font-family:var(--display);font-weight:800;font-size:1rem;color:var(--teal-d);margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em}
+
+/* no-results */
+.empty{padding:52px 0;text-align:center;color:#8a8070}
+.empty h3{font-size:1.5rem;margin-bottom:.5em}
+
+/* featured banner */
+.featured{background:var(--ink);color:var(--chalk);padding:38px 0;border-top:4px solid var(--mustard);border-bottom:4px solid var(--mustard)}
+.featured-inner{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+.featured-label{display:inline-block;background:var(--mustard);color:var(--ink);font-weight:800;font-size:.8rem;padding:3px 12px;border-radius:999px;margin-bottom:10px;font-family:var(--display);letter-spacing:.03em}
+.featured h2{color:var(--mustard);font-size:clamp(1.5rem,3.5vw,2.1rem);margin-bottom:.4em}
+.featured p{max-width:50ch;color:#c9c2b4;font-size:.95rem;margin:0}
+.featured-badge{background:var(--brick);color:#fff;border:4px solid var(--mustard);border-radius:16px;padding:16px 24px;text-align:center;font-family:var(--display);font-weight:800}
+.featured-badge .num{font-size:3rem;color:var(--mustard);line-height:1;display:block}
+.featured-badge .lbl{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+
+footer{background:var(--ink);color:#d9d2c3;padding:36px 0;font-size:.93rem;border-top:4px solid var(--mustard)}
+footer .logo{display:inline-block;margin-bottom:8px}
+footer p{margin-bottom:.4em}
+footer a{color:var(--mustard);font-weight:600}
+
+@media(max-width:680px){
+  .two-col{grid-template-columns:1fr}
+  .featured-inner{grid-template-columns:1fr}
+  .featured-badge{display:none}
+  .modal-body{padding:20px 18px}
+  .modal-head{padding:22px 18px 16px}
+}
+</style>
+</head>
+<body>
+
+<nav aria-label="Főmenü">
+  <div class="wrap">
+    <a class="logo" href="index.html">Füst &amp; Parázs</a>
+    <ul>
+      <li><a href="index.html">Főoldal</a></li>
+      <li><a href="recept.html" aria-current="page">Receptek</a></li>
+      <li><a href="regisztracio.html">Regisztráció</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <h1>BBQ-receptek</h1>
+    <p>Kipróbált tűzön sütős receptek lépésről lépésre — a gyors kolbásztól a komoly 10 órás pulled porkig.</p>
+  </div>
+</header>
+
+<div class="featured">
+  <div class="wrap">
+    <div class="featured-inner">
+      <div>
+        <span class="featured-label">🔥 Heti kiemelt</span>
+        <h2>Füstölt pulled pork</h2>
+        <p>Az igazi BBQ-klasszikus. Hosszú folyamat, de az eredmény lenyűgöző — omlós, lédús, füstös. Érdemes hétvégére időzíteni.</p>
+      </div>
+      <div class="featured-badge">
+        <span class="num">10h</span>
+        <span class="lbl">Sütési idő</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="filterbar" aria-label="Szűrés kategória szerint">
+  <div class="wrap">
+    <button class="pill" aria-selected="true" data-filter="mind">Mind</button>
+    <button class="pill" aria-selected="false" data-filter="gyors">Gyors</button>
+    <button class="pill" aria-selected="false" data-filter="bbq">Low &amp; Slow</button>
+    <button class="pill" aria-selected="false" data-filter="grill">Grill</button>
+    <button class="pill" aria-selected="false" data-filter="zoldseg">Zöldség</button>
+  </div>
+</nav>
+
+<section class="recipe-grid">
+  <div class="wrap">
+    <div class="grid" id="recipe-grid">
+
+      <!-- Pulled pork -->
+      <article class="rcard" data-kat="bbq" role="button" tabindex="0" aria-label="Receptkártya: Füstölt pulled pork – megnyitás" onclick="openRecipe('pullpork')" onkeydown="if(event.key==='Enter')openRecipe('pullpork')">
+        <div class="rcard-top">
+          <h3>Füstölt pulled pork</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Low &amp; Slow</span>
+            <span class="tag">⏱ 10 óra</span>
+            <span class="tag">👥 8–10 fő</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Sertéslapocka, füstölt paprika, barna cukor. Lassú, füstös sütés után villával száljaira húzható omlós hús.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('pullpork')">Recept megnyitása</button>
+        </div>
+      </article>
+
+      <!-- Steak -->
+      <article class="rcard" data-kat="grill" role="button" tabindex="0" aria-label="Receptkártya: Klasszikus ribeye steak" onclick="openRecipe('ribeye')" onkeydown="if(event.key==='Enter')openRecipe('ribeye')">
+        <div class="rcard-top">
+          <h3>Ribeye steak</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Grill</span>
+            <span class="tag">⏱ 20 perc</span>
+            <span class="tag">👥 2 fő</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Erős tűzön, vajas fürdőben fejezve be. Csak só, bors, fokhagyma és jó minőségű hús kell hozzá.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('ribeye')">Recept megnyitása</button>
+        </div>
+      </article>
+
+      <!-- Oldalas -->
+      <article class="rcard" data-kat="bbq" role="button" tabindex="0" aria-label="Receptkártya: BBQ oldalas" onclick="openRecipe('oldalas')" onkeydown="if(event.key==='Enter')openRecipe('oldalas')">
+        <div class="rcard-top">
+          <h3>BBQ oldalas (3-2-1 módszer)</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Low &amp; Slow</span>
+            <span class="tag">⏱ 6 óra</span>
+            <span class="tag">👥 4–6 fő</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Klasszikus versenyoldalas házilag: 3 óra fű, 2 óra fóliában, 1 óra szósszal — minden bordán kijön a hús.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('oldalas')">Recept megnyitása</button>
+        </div>
+      </article>
+
+      <!-- Grillezett zöldség -->
+      <article class="rcard" data-kat="zoldseg" role="button" tabindex="0" aria-label="Receptkártya: Grillezett zöldségek" onclick="openRecipe('zoldseg')" onkeydown="if(event.key==='Enter')openRecipe('zoldseg')">
+        <div class="rcard-top">
+          <h3>Fűszeres grillezett zöldségek</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Zöldség</span>
+            <span class="tag">⏱ 25 perc</span>
+            <span class="tag">👥 4 fő</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Cukkini, paprika, padlizsán és gomba, fokhagymás-olívaolajos páccal. Remek köret vagy önálló fogás.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('zoldseg')">Recept megnyitása</button>
+        </div>
+      </article>
+
+      <!-- Kolbász -->
+      <article class="rcard" data-kat="gyors" role="button" tabindex="0" aria-label="Receptkártya: Gyors grill kolbász" onclick="openRecipe('kolbasz')" onkeydown="if(event.key==='Enter')openRecipe('kolbasz')">
+        <div class="rcard-top">
+          <h3>Tökéletes grill kolbász</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Gyors</span>
+            <span class="tag">⏱ 15 perc</span>
+            <span class="tag">👥 tetszőleges</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Nem kell hozzá semmi — csak a megfelelő hőmérséklet és türelem. Kettévágás előtt pihentetni kell.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('kolbasz')">Recept megnyitása</button>
+        </div>
+      </article>
+
+      <!-- Csirkecomb -->
+      <article class="rcard" data-kat="grill" role="button" tabindex="0" aria-label="Receptkártya: Pácolt csirkecomb" onclick="openRecipe('csirke')" onkeydown="if(event.key==='Enter')openRecipe('csirke')">
+        <div class="rcard-top">
+          <h3>Pácolt csirkecomb grillről</h3>
+          <div class="rcard-meta">
+            <span class="tag kat">Grill</span>
+            <span class="tag">⏱ 40 perc + pácolás</span>
+            <span class="tag">👥 4 fő</span>
+          </div>
+        </div>
+        <div class="rcard-body">
+          <p>Éjszakás citromos-fokhagymás pác után közvetett hőn sütve: kívül ropogós bőr, belül lédús hús.</p>
+          <button class="rcard-btn" onclick="event.stopPropagation();openRecipe('csirke')">Recept megnyitása</button>
+        </div>
+      </article>
+
+    </div>
+    <p id="empty-msg" style="display:none" class="empty"><br><br>Nincs ilyen kategóriájú recept.</p>
+  </div>
+</section>
+
+<!-- RECIPE MODALS -->
+<div class="overlay" id="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close" aria-label="Bezárás">✕</button>
+    <div class="modal-head" id="modal-head"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="index.html">Füst &amp; Parázs</a>
+    <p>Receptek, BBQ-tippek és a tűzön sütés világa.</p>
+    <p><a href="index.html">← Vissza a főoldalra</a> · <a href="regisztracio.html">Regisztráció</a></p>
+  </div>
+</footer>
+
+<script>
+var RECIPES = {
+  pullpork: {
+    title: 'Füstölt pulled pork',
+    kat: 'Low & Slow',
+    ido: '8–10 óra',
+    adag: '8–10 fő',
+    desc: 'A BBQ királyát nem lehet siettetni. Lassú, füstös sütéssel a kötőszövet teljesen feloldódik, és a hús száljaira húzható.',
+    hozzavalok: [
+      '2,5–3 kg sertéslapocka (csont nélkül)',
+      '3 ek barna cukor',
+      '2 ek füstölt paprika',
+      '1 ek só',
+      '1 ek fekete bors',
+      '1 tk fokhagymapor',
+      '1 tk hagymapor',
+      '1 dl almalé a permetezéshez'
+    ],
+    lepesek: [
+      'Keverd össze a fűszereket, és dörzsöld be jól a húst minden oldalon. Fedd le, és pihentesd hűtőben legalább 2–12 órát.',
+      'Állítsd be a smokert vagy a zárt grillt közvetett hőre, 110–120 °C-ra. Tegyél rá almafa- vagy cseresznyefadarabokat.',
+      'Helyezd a húst a rácson a tűzforráson kívüli részre. Süsd 5–6 órán át, óránként permetezd meg almalével.',
+      'Ha a belseje eléri a 70 °C-ot, csomagold szorosan dupla alufóliába. Süsd tovább, amíg a belső hőmérséklet eléri a 93–96 °C-ot.',
+      'Vedd le a tűzről, és pihentesd 30–60 percig fóliában. Ezután villával húzd száljaira.',
+      'Tálald friss zsemlével, házi coleslaw-val és BBQ-szósszal.'
+    ],
+    tipp: 'Ha nincs hőmérőd, nem tudod pontosan mikor kész — vegyél egyet. A belső hőmérséklet mindennél fontosabb.'
+  },
+  ribeye: {
+    title: 'Ribeye steak grillről',
+    kat: 'Grill',
+    ido: '20 perc',
+    adag: '2 fő',
+    desc: 'Egy jó ribeye-hoz nem kell sok. Jó hús, forró grill, vaj és türelem — ennyi az egész.',
+    hozzavalok: [
+      '2 db ribeye szelet (2,5–3 cm vastag, egyenként ~350 g)',
+      'Durva tengeri só',
+      'Frissen tört fekete bors',
+      '3 gerezd fokhagyma, megnyomva',
+      '2 ek vaj',
+      'Friss kakukkfű vagy rozmaring'
+    ],
+    lepesek: [
+      'A húst vedd ki a hűtőből 30–45 perccel sütés előtt. Itassuk szárazra papírtörlővel, és sózd meg bőkezűen mindkét oldalán.',
+      'Hevítsd fel a grillt maximumra — amennyire csak tudod. Kellenek a jó pörk nyomok.',
+      'Tedd a húst a legforróbb részre, és 2–3 percig ne mozdítsd. Fordítsd el 90 fokkal a rácsmintáért, és süsd még 1 percig.',
+      'Fordítsd meg, és süsd a másik oldalon szintén 2–3 percig medium-rare-hez (57 °C belül).',
+      'Tedd az oldalára, és süsd körbe a zsírperemét is 1–2 percig.',
+      'Vedd le a rácstól, tedd tálba, add hozzá a vajat, fokhagymát és kakukkfüvet, és 1 percig locsold a húst az olvadó vajjal.',
+      'Pihentesd 5–7 percig szeletelés előtt.'
+    ],
+    tipp: 'Reverse sear is működik: 110 °C-on süsd belső hőig, aztán villámgyors pörk nagyon forró grillen. Egyenletesebb sülés jön ki.'
+  },
+  oldalas: {
+    title: 'BBQ oldalas – 3-2-1 módszer',
+    kat: 'Low & Slow',
+    ido: '6 óra',
+    adag: '4–6 fő',
+    desc: 'A 3-2-1 egy bevált módszer: 3 óra füst, 2 óra fóliában párban, 1 óra szósszal lakkozva. Garantáltan kijön a hús a bordáról.',
+    hozzavalok: [
+      '2 lap sertésoldalas (baby back vagy spare ribs)',
+      '3 ek barna cukor',
+      '2 ek füstölt paprika',
+      '1 ek só és fekete bors',
+      '1 tk fokhagymapor, 1 tk hagymapor',
+      '1 tk mustárpor',
+      '4 ek vaj + 4 ek méz a fóliába',
+      '150 ml kedvenc BBQ-szósze'
+    ],
+    lepesek: [
+      'Távolítsd el az oldalas belső oldaláról a hártyát: csúsztass kést a csontok mentén, fogd meg papírtörlővel, és húzd le egyetlen mozdulattal.',
+      'Dörzsöld be mustárral (kötőanyagként), majd add rá a szárazpácot. Pihentesd 1–4 órát.',
+      'Állítsd a grillt vagy smokert 110–120 °C-ra. 3 órán át gyümölcsfán füstöld közvetett hőn.',
+      'Teríts dupla alufóliát, tedd rá az oldalast húsos felével lefelé, adj rá vajat és mézet, csomagold szorosan. Süsd fóliában 2 órát.',
+      'Vedd ki a fóliából, kend meg BBQ-szósszal, és süsd vissza rácson 1 óráig, 20 percenként újra kenve.',
+      'Hagyd pihenni 10 percig, majd portírozd egy csont mentén.'
+    ],
+    tipp: 'Ha az oldalas meghajlik, amikor a közepénél emeled fel — kész. Ha megtörik, 15 percet visszament vele.'
+  },
+  zoldseg: {
+    title: 'Fűszeres grillezett zöldségek',
+    kat: 'Zöldség',
+    ido: '25 perc',
+    adag: '4 fő',
+    desc: 'Grillezett zöldség: sok ember nem veszi komolyan, és ez hatalmas hiba. A karamellizáció és a füst teljesen más dimenziót ad.',
+    hozzavalok: [
+      '1 közepes cukkini, karikázva',
+      '2 paprika (piros, sárga), cikkekre vágva',
+      '1 padlizsán, karikázva',
+      '200 g gomba (csiperkegomba vagy portobello)',
+      '4 gerezd fokhagyma, finomra vágva',
+      '4 ek olívaolaj',
+      'Só, bors, szárított kakukkfű',
+      'Feta sajt a tálaláshoz (elhagyható)'
+    ],
+    lepesek: [
+      'Keverd össze az olívaolajat, fokhagymát, sót, borsot és kakukkfüvet. Forgasd bele a zöldségeket, és pihentesd 15 percig.',
+      'Hevítsd a grillt közepesen magasra (180–200 °C). Olajozd meg a rácsot.',
+      'A zöldségeket terítsd ki a rácson egy rétegben. Ne torlaszd össze — legyenek résök köztük.',
+      'Cukkini és paprika: 3–4 perc oldalanként. Padlizsán: 4–5 perc oldalanként. Gomba: 5 perc oldalanként.',
+      'Vedd le, ha szép rácsmintát kaptak és átsültek, de még nem puhák egészen.',
+      'Tálald melegen vagy szobahőmérsékleten, ha van, morzsold rá a fetát.'
+    ],
+    tipp: 'Grillkosarat vagy -lapot érdemes venni a gomba és a kisebb darabok miatt. Különben mind lehull a réseken.'
+  },
+  kolbasz: {
+    title: 'Tökéletes grill kolbász',
+    kat: 'Gyors',
+    ido: '15 perc',
+    adag: 'tetszőleges',
+    desc: 'A legegyszerűbb BBQ-étel — mégis mindenki elrontja. A titok: nem kell szurkálni, nem kell vágni félbe, és türelem kell.',
+    hozzavalok: [
+      'Jó minőségű sertés grillkolbász',
+      'Mustár, ketchup, friss kenyér a tálaláshoz'
+    ],
+    lepesek: [
+      'A kolbászt ne szúrd meg — a leve ki fog folyni és lángra lobbantja a parázst.',
+      'Hevítsd a grillt közepesre (160–180 °C). NE tedd nagyon forró parázsra.',
+      'Tedd a kolbászt a rácson enyhén olajozott részre. 10–12 percig forgasd rendszeresen minden oldalán.',
+      'Kész, ha belül eléri a 72 °C-ot, és a bőre szép barna — nem fekete — minden oldalán.',
+      'Pihentesd 2–3 percig szeletelés előtt, különben az összes leve kifolyik.'
+    ],
+    tipp: 'Ha mégis lángra kap — ne fujj rá, ne locsolj vizet. Vedd arrébb a kolbászt és zárd le a levegőt. A zsír táplálja a lángot.'
+  },
+  csirke: {
+    title: 'Pácolt csirkecomb grillről',
+    kat: 'Grill',
+    ido: '40 perc + éjszakás pácolás',
+    adag: '4 fő',
+    desc: 'A csirke bőre kívül ropogós, belül omlós — erre nagyon pontosan kell figyelni a hőmérsékleten. Közvetett hő, lassabb befejezés.',
+    hozzavalok: [
+      '4 csirkecomb (csontos-bőrös)',
+      '1 citrom leve és héja',
+      '4 ek olívaolaj',
+      '4 gerezd fokhagyma, pépesítve',
+      '1 tk füstölt paprika',
+      '1 tk oregánó',
+      'Só, bors'
+    ],
+    lepesek: [
+      'Keverd össze a pác hozzávalóit. Vágj a csirkecombokba pár mélyebb bevágást — behatol a pác. Forgasd be, fedd le, és hűtsd legalább 4 órát, ideálisan egész éjjel.',
+      'Hevítsd a grillt közvetett hőre (160–170 °C). Az egyik oldalon legyen parázs, a másikon ne.',
+      'Tedd a combot bőrös oldalával felfelé a parázsmentes oldalra. Zárd le a fedőt.',
+      '25–30 percig süsd fedővel, míg belső hőmérséklete eléri a 68–70 °C-ot.',
+      'Tedd át a parázs fölé, bőrös oldallal lefelé. 4–5 perc alatt süsd ropogósra a bőrt.',
+      'Belső hőmérsékletnek el kell érnie a 74 °C-ot. Pihentesd 5 percig.'
+    ],
+    tipp: 'Ha a bőr túl hamar megég: a csirke belül még nyers. Közvetett hőt ne hagyd ki — a bőr szép lesz a végén, ígérem.'
+  }
+};
+
+function openRecipe(id) {
+  var r = RECIPES[id];
+  if (!r) return;
+  var head = document.getElementById('modal-head');
+  var body = document.getElementById('modal-body');
+  head.innerHTML = '<h2 id="modal-title">' + r.title + '</h2><div class="modal-meta">'
+    + '<span class="tag kat">' + r.kat + '</span>'
+    + '<span class="tag">⏱ ' + r.ido + '</span>'
+    + '<span class="tag">👥 ' + r.adag + '</span>'
+    + '</div>';
+  var ingHtml = r.hozzavalok.map(function(h){ return '<li>' + h + '</li>'; }).join('');
+  var stepHtml = r.lepesek.map(function(l){ return '<li>' + l + '</li>'; }).join('');
+  body.innerHTML = '<p style="margin-bottom:20px;font-size:.97rem">' + r.desc + '</p>'
+    + '<div class="two-col">'
+    + '<div><p class="modal-section-title">Hozzávalók</p><ul class="ing-list">' + ingHtml + '</ul></div>'
+    + '<div><p class="modal-section-title">Elkészítés</p><ol class="steps-list">' + stepHtml + '</ol></div>'
+    + '</div>'
+    + (r.tipp ? '<div class="modal-tip"><b>💡 Tipp:</b> ' + r.tipp + '</div>' : '');
+  document.getElementById('overlay').removeAttribute('hidden');
+  document.getElementById('modal-close').focus();
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRecipe() {
+  document.getElementById('overlay').setAttribute('hidden', '');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modal-close').addEventListener('click', closeRecipe);
+document.getElementById('overlay').addEventListener('click', function(e){
+  if(e.target === this) closeRecipe();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeRecipe();
+});
+
+// filter
+document.querySelectorAll('[data-filter]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('[data-filter]').forEach(function(b){ b.setAttribute('aria-selected','false'); });
+    btn.setAttribute('aria-selected','true');
+    var f = btn.dataset.filter;
+    var cards = document.querySelectorAll('.rcard');
+    var any = false;
+    cards.forEach(function(c){
+      var show = f === 'mind' || c.dataset.kat === f;
+      c.style.display = show ? '' : 'none';
+      if(show) any = true;
+    });
+    document.getElementById('empty-msg').style.display = any ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>
