@@ -7,23 +7,105 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  nav.main-nav { position: sticky; top: 0; z-index: 100; background: rgba(23,26,29,.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.1); }
-  .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; max-width: 1240px; margin: 0 auto; flex-wrap: wrap; }
-  .nav-links { display: flex; gap: 12px; list-style: none; align-items: center; margin: 0; padding: 0; }
-  .nav-links li a { color: var(--chalk); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 8px 12px; border-radius: 6px; transition: background 0.2s; }
-  .nav-links li a:hover { background: rgba(255,255,255,.12); }
-  .auth-buttons { display: flex; gap: 10px; align-items: center; }
-  .btn-login { color: var(--chalk); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3); transition: background 0.2s; }
-  .btn-login:hover { background: rgba(255,255,255,.1); }
-  .btn-register { background: var(--mustard); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; transition: transform 0.2s; }
-  .btn-register:hover { transform: translateY(-2px); }
-  .hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 5px; }
-  .hamburger span { display: block; width: 25px; height: 3px; background-color: var(--chalk); border-radius: 3px; transition: 0.3s; }
-  @media (max-width: 1100px) {
-    .nav-links { display: none; width: 100%; flex-direction: column; order: 4; background: var(--ink); padding: 15px 0; border-radius: 0 0 10px 10px; }
-    .main-nav.open .nav-links { display: flex; }
-    .auth-buttons { order: 2; margin-left: auto; margin-right: 15px; }
-    .hamburger { display: flex; order: 3; }
+  /* Kártya / Modal stílusok */
+  .place {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .place:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+  
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  .modal-card {
+    background: #fff;
+    border-radius: 24px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+    position: relative;
+    padding: 32px;
+    animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--chalk);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    color: var(--ink);
+  }
+  .modal-close:hover {
+    background: #e0dbd1;
+  }
+  .modal-title {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    color: var(--teal);
+    margin-bottom: 8px;
+    padding-right: 40px;
+  }
+  .modal-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .modal-section-title {
+    font-family: var(--display);
+    font-size: 1.1rem;
+    color: var(--brick);
+    margin: 24px 0 12px 0;
+    border-bottom: 2px solid #f0ece4;
+    padding-bottom: 6px;
+  }
+  .modal-content-box {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    background: var(--chalk);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+  .modal-actions {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #f0ece4;
+    padding-top: 20px;
   }
 </style>
 </head>
@@ -39,10 +121,7 @@
       <li><a href="recept.html">Receptek</a></li>
       <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
-    <div class="auth-buttons" id="auth-nav">
-      <a href="belepes.html" class="btn-login">Belépés</a>
-      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
-    </div>
+    <div class="auth-buttons" id="auth-nav"></div>
     <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
       <span></span><span></span><span></span>
     </button>
@@ -57,17 +136,14 @@
 </header>
 
 <main style="padding: 40px 0; min-height: 80vh; background: var(--chalk);">
-
-  <!-- RECEPT FELTÖLTÉSE -->
   <section id="recept-feltoltes" style="padding-bottom: 40px;">
     <div class="wrap">
       <div class="panel" id="upload-panel" style="max-width: 800px; margin: 0 auto; display: none;">
-        <h3 style="color: var(--teal);">Új recept hozzáadása</h3>
+        <h3 id="form-title" style="color: var(--teal);">Új recept hozzáadása</h3>
         <p style="font-size: 0.95rem; margin-bottom: 20px;">Töltsd ki az alábbi mezőket a receptedhez. A csillaggal jelölt mezők kötelezőek.</p>
         
         <form class="regform" id="form-recept" onsubmit="return false">
           <label class="full">Recept neve *<input type="text" id="rec-name" maxlength="80" required placeholder="Pl. Füstölt csirkecomb"></label>
-          
           <label>Kategória<select id="rec-kat">
             <option value="marha">Marha</option>
             <option value="sertes">Sertés</option>
@@ -76,13 +152,9 @@
             <option value="vega">Vegetáriánus</option>
             <option value="egyeb">Egyéb</option>
           </select></label>
-          
           <label>Elkészítési idő (perc)<input type="number" id="rec-time" min="5" max="1440" value="60" required></label>
-          
           <label class="full">Hozzávalók (soronként egy)<textarea id="rec-ing" maxlength="1000" required placeholder="2 kg sertéslapocka&#10;3 ek barna cukor&#10;1 ek só"></textarea></label>
-          
           <label class="full">Elkészítés lépései<textarea id="rec-steps" maxlength="2000" required placeholder="1. Keverd össze a fűszereket...&#10;2. Állítsd be a smokert..."></textarea></label>
-          
           <button class="btn full" type="button" id="btn-add-recept" style="margin-top: 15px;">Recept mentése</button>
         </form>
         <p id="rec-msg" style="display:none; margin-top: 14px; color: var(--brick); font-weight: bold;"></p>
@@ -92,17 +164,13 @@
         <h3 style="color: var(--teal);">Recept feltöltéséhez be kell jelentkezned</h3>
         <p style="margin: 15px 0;">Ahhoz, hogy saját receptet tölthess fel, először létre kell hoznod egy fiókot, vagy be kell jelentkezned.</p>
         <a href="belepes.html" class="btn" style="display: inline-block;">Belépés</a>
-        <p style="margin-top: 15px; font-size: 0.9rem;"><a href="regisztracio.html" style="color: var(--teal); font-weight: 700;">Vagy regisztrálj új fiókot</a></p>
       </div>
     </div>
   </section>
 
-  <!-- RECEPT LISTA -->
   <section id="recept-lista" class="alt" style="padding-top: 40px;">
     <div class="wrap">
       <h2>Közösségi receptek</h2>
-      <p>Böngéssz a feltöltött receptek között, és találd meg a következő vasárnapi ebédet.</p>
-      
       <div class="tabs" id="filter-recept" role="tablist" aria-label="Recept kategóriák">
         <button type="button" role="tab" aria-selected="true" data-filter="mind">Mind</button>
         <button type="button" role="tab" aria-selected="false" data-filter="marha">Marha</button>
@@ -111,14 +179,33 @@
         <button type="button" role="tab" aria-selected="false" data-filter="hal">Hal</button>
         <button type="button" role="tab" aria-selected="false" data-filter="vega">Vega</button>
       </div>
-
-      <div class="cards" id="rec-list">
-        <p>Receptek betöltése...</p>
-      </div>
+      <div class="cards" id="rec-list"><p>Receptek betöltése...</p></div>
     </div>
   </section>
-
 </main>
+
+<!-- Felugró kártya (Modal) -->
+<div class="modal-overlay" id="recipe-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn" aria-label="Bezárás">&times;</button>
+    <h2 class="modal-title" id="modal-title">Recept neve</h2>
+    <div class="modal-meta">
+      <span id="modal-kat" class="badge" style="background:var(--teal); color:#fff;">Kategória</span>
+      <span id="modal-time" style="font-weight:700;">Idő</span>
+      <span id="modal-author">Feltöltötte</span>
+    </div>
+    
+    <div class="modal-section-title">Hozzávalók</div>
+    <div class="modal-content-box" id="modal-ingredients"></div>
+    
+    <div class="modal-section-title">Elkészítés</div>
+    <div class="modal-content-box" id="modal-steps"></div>
+    
+    <div class="modal-actions" id="modal-actions">
+      <!-- Ide jön a módosítás gomb, ha a saját recept -->
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -129,103 +216,146 @@
 <script src="js/app.js"></script>
 <script>
 (function () {
-  'use strict';
+  var user = JSON.parse(localStorage.getItem('fp_user') || 'null');
+  var ALL_RECIPES = [], ACTIVE_FILTER = 'mind';
+  var EDITING_ID = null; 
 
-  document.getElementById('ev').textContent = new Date().getFullYear();
+  var urlParams = new URLSearchParams(window.location.search);
+  var viewId = urlParams.get('id');
+  var editId = urlParams.get('edit');
 
-  // Hamburger menü
-  const btn = document.getElementById('navbtn');
-  const nav = document.querySelector('.main-nav');
-  btn.addEventListener('click', function () {
-    nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
-  });
+  var modal = document.getElementById('recipe-modal');
 
-  // Auth sáv
-  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
-  const authNav = document.getElementById('auth-nav');
+  // Ha be van jelentkezve, mutatjuk a feltöltő űrlapot
   if (user) {
-    authNav.innerHTML = `<span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span><a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>`;
-    document.getElementById('logout-btn').addEventListener('click', function(e) { e.preventDefault(); localStorage.removeItem('fp_user'); window.location.reload(); });
-    
-    // Ha be van jelentkezve, mutatjuk a feltöltőt
     document.getElementById('upload-panel').style.display = 'block';
     document.getElementById('login-prompt').style.display = 'none';
-  }
-
-  var ALL_RECIPES = [];
-  var ACTIVE_FILTER = 'mind';
-
-  // Betöltés
-  function loadRecipes() {
-    fetch('/api/receptek')
-      .then(r => r.json())
-      .then(data => {
-        ALL_RECIPES = data || [];
-        renderRecipes();
-      })
-      .catch(() => {
-        ALL_RECIPES = [
-          { id: 1, cim: 'Füstölt pulled pork', kat: 'sertes', ido_perc: 600, hozzavalok: '2.5kg lapocka\nFűszerek', lepesek: '1. Dörzsöld be...\n2. Füstöld...', feltolto_nev: 'Rendszer' },
-          { id: 2, cim: 'Brisket', kat: 'marha', ido_perc: 720, hozzavalok: '4kg marhamell\nSó, bors', lepesek: '1. Sózd be...\n2. Füstöld 110 fokon...', feltolto_nev: 'Rendszer' }
-        ];
-        renderRecipes();
-      });
-  }
-
-  // Render
-  function renderRecipes() {
-    var box = document.getElementById('rec-list');
-    box.innerHTML = '';
-    
-    var filtered = ALL_RECIPES.filter(function(r) {
-      return ACTIVE_FILTER === 'mind' || r.kat === ACTIVE_FILTER;
-    });
-
-    if (!filtered.length) {
-      box.innerHTML = '<p>Nincs találat ebben a kategóriában.</p>';
-      return;
+    if (editId) {
+      document.getElementById('form-title').textContent = 'Recept módosítása';
+      document.getElementById('btn-add-recept').textContent = 'Recept módosítása';
     }
+  }
+
+  function loadRecipes() {
+    window.fpApi('GET', '/receptek').then(data => { 
+      ALL_RECIPES = data || []; 
+      
+      if (editId) {
+        var recipeToEdit = ALL_RECIPES.find(r => String(r.id) === String(editId));
+        if (recipeToEdit && user && recipeToEdit.feltolto_id === user.id) {
+          EDITING_ID = recipeToEdit.id;
+          document.getElementById('rec-name').value = recipeToEdit.cim || '';
+          document.getElementById('rec-kat').value = recipeToEdit.kat || 'egyeb';
+          document.getElementById('rec-time').value = recipeToEdit.ido_perc || 60;
+          document.getElementById('rec-ing').value = recipeToEdit.hozzavalok || '';
+          document.getElementById('rec-steps').value = recipeToEdit.lepesek || '';
+          document.getElementById('recept-feltoltes').scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('Ezt a receptet nem találtuk, vagy nincs jogosultságod módosítani.');
+          window.history.replaceState({}, '', 'recept.html');
+          editId = null;
+        }
+      }
+
+      renderRecipes(); 
+
+      // Ha az URL-ben volt id, és nem szerkesztünk, akkor nyissuk meg a modalt
+      if (viewId && !editId) {
+        var recipeToView = ALL_RECIPES.find(r => String(r.id) === String(viewId));
+        if (recipeToView) openModal(recipeToView);
+      }
+    }).catch(() => { ALL_RECIPES = []; renderRecipes(); });
+  }
+
+  function renderRecipes() {
+    var box = document.getElementById('rec-list'); box.innerHTML = '';
+    var filtered = ALL_RECIPES.filter(r => ACTIVE_FILTER === 'mind' || r.kat === ACTIVE_FILTER);
+    
+    if (!filtered.length) { box.innerHTML = '<p>Nincs találat ebben a kategóriában.</p>'; return; }
 
     filtered.forEach(function(item) {
-      var card = document.createElement('article');
+      var card = document.createElement('article'); 
       card.className = 'place';
+      card.style.cursor = 'pointer';
       
-      var badgeText = item.kat ? item.kat.toUpperCase() : 'EGYÉB';
       var time = item.ido_perc ? Math.floor(item.ido_perc / 60) + ' óra ' + (item.ido_perc % 60) + ' perc' : 'Ismeretlen idő';
-      
+
+      // Rövidített leírás a kártyára
+      var preview = item.hozzavalok ? item.hozzavalok.split('\n')[0] : '';
+
       card.innerHTML = `
-        <span class="badge" style="background:var(--teal); color:white;">${badgeText}</span>
+        <span class="badge" style="background:var(--teal); color:white;">${item.kat.toUpperCase()}</span>
         <h3>${item.cim}</h3>
         <div class="where">Elkészítési idő: ${time}</div>
         <p style="margin-bottom: 10px; font-size: 0.85rem; color: var(--ink);">Feltöltötte: <b>${item.feltolto_nev || 'Névtelen'}</b></p>
-        
-        <details style="margin-bottom: 0;">
-          <summary>Hozzávalók és lépések</summary>
-          <div style="margin-top: 15px;">
-            <h4 style="font-size: 0.95rem; margin-bottom: 5px; color: var(--brick);">Hozzávalók:</h4>
-            <div style="font-size: 0.9rem; white-space: pre-wrap; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--line);">${item.hozzavalok}</div>
-            
-            <h4 style="font-size: 0.95rem; margin-bottom: 5px; color: var(--brick);">Elkészítés:</h4>
-            <div style="font-size: 0.9rem; white-space: pre-wrap; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--line);">${item.lepesek}</div>
-          </div>
-        </details>
+        <p style="font-size: 0.9rem; color:#666; font-style: italic;">Kattints a teljes recept megtekintéséhez!</p>
       `;
+      
+      // Kattintásra megnyílik a modal
+      card.addEventListener('click', function() {
+        openModal(item);
+      });
+
       box.appendChild(card);
     });
   }
 
-  // Szűrő
-  document.querySelectorAll('#filter-recept [role="tab"]').forEach(function(t) {
+  function openModal(item) {
+    document.getElementById('modal-title').textContent = item.cim;
+    document.getElementById('modal-kat').textContent = item.kat.toUpperCase();
+    document.getElementById('modal-time').textContent = item.ido_perc ? Math.floor(item.ido_perc / 60) + 'ó ' + (item.ido_perc % 60) + 'p' : '—';
+    document.getElementById('modal-author').textContent = 'Feltöltötte: ' + (item.feltolto_nev || 'Névtelen');
+    document.getElementById('modal-ingredients').textContent = item.hozzavalok || 'Nincsenek megadva hozzávalók.';
+    document.getElementById('modal-steps').textContent = item.lepesek || 'Nincsenek megadva lépések.';
+
+    // Gombok kezelése
+    var actionsBox = document.getElementById('modal-actions');
+    actionsBox.innerHTML = '';
+    
+    // Ha a bejelentkezett user a tulaj, adjuk hozzá a módosítás gombot
+    if (user && item.feltolto_id === user.id) {
+      var editBtn = document.createElement('a');
+      editBtn.href = 'recept.html?edit=' + item.id;
+      editBtn.className = 'btn';
+      editBtn.style.marginTop = '0';
+      editBtn.textContent = 'Recept módosítása';
+      actionsBox.appendChild(editBtn);
+    }
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Ne lehessen görgetni a háttérben
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    // Ha az URL-ben benne volt az ID, tüntessük el, hogy ne nyíljon újra
+    if (window.location.search.includes('id=')) {
+      window.history.replaceState({}, '', 'recept.html');
+    }
+  }
+
+  // Bezárás események
+  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal(); // Kattintás a sötét háttérre
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+  });
+
+  // Kategória szűrők
+  document.querySelectorAll('#filter-recept [role="tab"]').forEach(t => {
     t.addEventListener('click', function() {
-      document.querySelectorAll('#filter-recept [role="tab"]').forEach(function(b) { b.setAttribute('aria-selected', 'false'); });
-      t.setAttribute('aria-selected', 'true');
-      ACTIVE_FILTER = t.getAttribute('data-filter');
+      document.querySelectorAll('#filter-recept [role="tab"]').forEach(b => b.setAttribute('aria-selected', 'false'));
+      t.setAttribute('aria-selected', 'true'); 
+      ACTIVE_FILTER = t.getAttribute('data-filter'); 
       renderRecipes();
     });
   });
 
-  // Recept mentése
+  // Recept mentése / módosítása az űrlapon
   document.getElementById('btn-add-recept').addEventListener('click', function() {
     var cim = document.getElementById('rec-name').value.trim();
     var kat = document.getElementById('rec-kat').value;
@@ -234,30 +364,21 @@
     var lep = document.getElementById('rec-steps').value.trim();
     var msg = document.getElementById('rec-msg');
 
-    if (!cim || !hozz || !lep) {
-      msg.style.display = 'block';
-      msg.textContent = 'Minden mező kitöltése kötelező!';
-      return;
-    }
+    if (!cim || !hozz || !lep) { msg.style.display = 'block'; msg.textContent = 'Minden mező kitöltése kötelező!'; return; }
 
-    fetch('/api/receptek', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
-      body: JSON.stringify({ cim: cim, kat: kat, ido_perc: ido, hozzavalok: hozz, lepesek: lep })
+    var payload = { cim: cim, kat: kat, ido_perc: ido, hozzavalok: hozz, lepesek: lep };
+    var method = EDITING_ID ? 'PUT' : 'POST';
+    var url = EDITING_ID ? '/receptek/' + EDITING_ID : '/receptek';
+
+    window.fpApi(method, url, payload)
+    .then(() => { 
+      alert(EDITING_ID ? 'Recept sikeresen módosítva!' : 'Recept sikeresen mentve!'); 
+      document.getElementById('form-recept').reset(); 
+      msg.style.display = 'none'; 
+      if (EDITING_ID) window.location.href = 'recept.html';
+      else loadRecipes(); 
     })
-    .then(r => r.json().then(j => ({ ok: r.ok, j: j })))
-    .then(res => {
-      if (!res.ok) { msg.style.display = 'block'; msg.textContent = res.j.error || 'Hiba történt.'; return; }
-      alert('Recept sikeresen mentve!');
-      document.getElementById('form-recept').reset();
-      msg.style.display = 'none';
-      loadRecipes(); // Újratöltjük a listát
-    })
-    .catch(() => {
-      // Demó mód
-      alert('Recept sikeresen mentve! (Demó)');
-      document.getElementById('form-recept').reset();
-    });
+    .catch(err => { msg.style.display = 'block'; msg.textContent = err.message; });
   });
 
   loadRecipes();

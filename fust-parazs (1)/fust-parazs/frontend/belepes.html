@@ -6,26 +6,6 @@
 <title>Belépés – Füst &amp; Parázs</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<style>
-  nav.main-nav { position: sticky; top: 0; z-index: 100; background: rgba(23,26,29,.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.1); }
-  .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; max-width: 1240px; margin: 0 auto; flex-wrap: wrap; }
-  .nav-links { display: flex; gap: 12px; list-style: none; align-items: center; margin: 0; padding: 0; }
-  .nav-links li a { color: var(--chalk); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 8px 12px; border-radius: 6px; transition: background 0.2s; }
-  .nav-links li a:hover { background: rgba(255,255,255,.12); }
-  .auth-buttons { display: flex; gap: 10px; align-items: center; }
-  .btn-login { color: var(--chalk); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3); transition: background 0.2s; }
-  .btn-login:hover { background: rgba(255,255,255,.1); }
-  .btn-register { background: var(--mustard); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; transition: transform 0.2s; }
-  .btn-register:hover { transform: translateY(-2px); }
-  .hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 5px; }
-  .hamburger span { display: block; width: 25px; height: 3px; background-color: var(--chalk); border-radius: 3px; transition: 0.3s; }
-  @media (max-width: 1100px) {
-    .nav-links { display: none; width: 100%; flex-direction: column; order: 4; background: var(--ink); padding: 15px 0; border-radius: 0 0 10px 10px; }
-    .main-nav.open .nav-links { display: flex; }
-    .auth-buttons { order: 2; margin-left: auto; margin-right: 15px; }
-    .hamburger { display: flex; order: 3; }
-  }
-</style>
 </head>
 <body>
 
@@ -39,10 +19,7 @@
       <li><a href="recept.html">Receptek</a></li>
       <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
-    <div class="auth-buttons" id="auth-nav">
-      <a href="belepes.html" class="btn-login">Belépés</a>
-      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
-    </div>
+    <div class="auth-buttons" id="auth-nav"></div>
     <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
       <span></span><span></span><span></span>
     </button>
@@ -82,22 +59,6 @@
 
 <script src="js/app.js"></script>
 <script>
-  document.getElementById('ev').textContent = new Date().getFullYear();
-  
-  const btn = document.getElementById('navbtn');
-  const nav = document.querySelector('.main-nav');
-  btn.addEventListener('click', function () {
-    nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
-  });
-
-  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
-  const authNav = document.getElementById('auth-nav');
-  if (user) {
-    authNav.innerHTML = `<span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span><a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>`;
-    document.getElementById('logout-btn').addEventListener('click', function(e) { e.preventDefault(); localStorage.removeItem('fp_user'); window.location.reload(); });
-  }
-
   document.getElementById('btn-login').addEventListener('click', function () {
     var email = document.getElementById('login-email').value.trim();
     var pass  = document.getElementById('login-pass').value;
@@ -109,31 +70,14 @@
       return;
     }
 
-    fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, jelszo: pass })
-    })
-    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+    window.fpApi('POST', '/auth/login', { email: email, jelszo: pass })
     .then(function (res) {
-      if (!res.ok) {
-        msg.style.display = 'block';
-        msg.textContent = res.j.error || 'Hibás email vagy jelszó.';
-        return;
-      }
-      localStorage.setItem('fp_user', JSON.stringify(res.j.user));
+      localStorage.setItem('fp_user', JSON.stringify(res.user));
       window.location.href = 'index.html';
     })
-    .catch(function () {
-      var users = JSON.parse(localStorage.getItem('fp_users') || '[]');
-      var user = users.find(function (u) { return u.email === email && u.jelszo === pass; });
-      if (!user) {
-        msg.style.display = 'block';
-        msg.textContent = 'Hibás email vagy jelszó (demó mód).';
-        return;
-      }
-      localStorage.setItem('fp_user', JSON.stringify(user));
-      window.location.href = 'index.html';
+    .catch(function (err) {
+      msg.style.display = 'block';
+      msg.textContent = err.message;
     });
   });
 </script>

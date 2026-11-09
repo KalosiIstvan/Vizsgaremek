@@ -7,51 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<style>
-  nav.main-nav { position: sticky; top: 0; z-index: 100; background: rgba(23,26,29,.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.1); }
-  .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; max-width: 1240px; margin: 0 auto; flex-wrap: wrap; }
-  .nav-links { display: flex; gap: 12px; list-style: none; align-items: center; margin: 0; padding: 0; }
-  .nav-links li a { color: var(--chalk); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 8px 12px; border-radius: 6px; transition: background 0.2s; }
-  .nav-links li a:hover { background: rgba(255,255,255,.12); }
-  .auth-buttons { display: flex; gap: 10px; align-items: center; }
-  .btn-login { color: var(--chalk); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3); transition: background 0.2s; }
-  .btn-login:hover { background: rgba(255,255,255,.1); }
-  .btn-register { background: var(--mustard); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; transition: transform 0.2s; }
-  .btn-register:hover { transform: translateY(-2px); }
-  .hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 5px; }
-  .hamburger span { display: block; width: 25px; height: 3px; background-color: var(--chalk); border-radius: 3px; transition: 0.3s; }
-  @media (max-width: 1100px) {
-    .nav-links { display: none; width: 100%; flex-direction: column; order: 4; background: var(--ink); padding: 15px 0; border-radius: 0 0 10px 10px; }
-    .main-nav.open .nav-links { display: flex; }
-    .auth-buttons { order: 2; margin-left: auto; margin-right: 15px; }
-    .hamburger { display: flex; order: 3; }
-  }
-
-  /* Térkép specifikus stílusok */
-  #map { height: 520px; width: 100%; border-radius: 18px; border: 1px solid var(--line); box-shadow: var(--shadow); z-index: 1; }
-  .map-popup h4 { margin: 0 0 4px; font-family: var(--display); font-size: 1.05rem; }
-  .map-popup .type { display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-bottom: 6px; }
-  .map-popup p { margin: 4px 0 8px; font-size: .85rem; line-height: 1.4; }
-  .star-row { display: flex; gap: 2px; align-items: center; }
-  .star-row button { background: none; border: 0; cursor: pointer; font-size: 1.35rem; line-height: 1; padding: 0 1px; color: #c9c2b4; }
-  .star-row button.on { color: var(--mustard); -webkit-text-stroke: 1px var(--ink); }
-  .star-row button:disabled { cursor: not-allowed; opacity: .5; }
-  .star-row span { font-size: .78rem; margin-left: 6px; font-weight: 700; color: var(--teal-d); }
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .85rem; font-weight: 600; margin: 10px 0 18px; }
-  .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 5px; vertical-align: -2px; }
-  .legend .l-e { background: #c2452d; }
-  .legend .l-t { background: #f5b82e; }
-  .legend .l-z { background: #12514d; }
-  .place .stars-static { font-size: 1.1rem; color: var(--mustard); letter-spacing: 1px; }
-  .place .stars-static .off { color: #d8d0c0; }
-  .site-rate { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-  .site-rate button { font-size: 1.7rem; background: none; border: 0; cursor: pointer; color: #c9c2b4; padding: 0 2px; }
-  .site-rate button.on { color: var(--mustard); -webkit-text-stroke: 1.2px var(--ink); }
-  .site-rate b { font-family: var(--display); font-size: 1.2rem; color: var(--brick); }
-  .owner-note { font-size: .8rem; font-weight: 700; color: var(--brick); margin-top: 6px; }
-  .county-filter { margin: 14px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .county-filter select { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
-</style>
 </head>
 <body>
 
@@ -65,10 +20,7 @@
       <li><a href="recept.html">Receptek</a></li>
       <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
-    <div class="auth-buttons" id="auth-nav">
-      <a href="belepes.html" class="btn-login">Belépés</a>
-      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
-    </div>
+    <div class="auth-buttons" id="auth-nav"></div>
     <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
       <span></span><span></span><span></span>
     </button>
@@ -127,21 +79,13 @@
 
     <div id="map" role="application" aria-label="Magyarország térkép a regisztrált helyekkel"></div>
 
-    <p class="note" style="margin-top: 14px;">
-      A térkép OpenStreetMap adatokat használ. A címeket a Nominatim szolgáltatás alakítja koordinátává.
-      Ha egy cím nem található, a hely a lista alján marad, térképjelölő nélkül.
-    </p>
+    <p class="note" style="margin-top: 14px;">A térkép OpenStreetMap adatokat használ. Ha egy cím nem található, a hely a lista alján marad, térképjelölő nélkül.</p>
 
     <h2 style="margin-top: 48px;">Összes hely listában</h2>
-    <p>Ha a térkép nem tölt be, itt minden hely megtalálható.</p>
-
-    <div class="cards" id="place-list">
-      <p>Betöltés…</p>
-    </div>
+    <div class="cards" id="place-list"><p>Betöltés…</p></div>
 
     <section class="panel" style="margin-top: 48px;">
       <h3 style="color: var(--teal);">Értékeld az oldalt</h3>
-      <p>Mennyire találtad hasznosnak a helykeresőt?</p>
       <div class="site-rate" id="site-rate">
         <button type="button" data-v="1" aria-label="1 csillag">★</button>
         <button type="button" data-v="2" aria-label="2 csillag">★</button>
@@ -166,60 +110,17 @@
 <script>
 (function () {
   'use strict';
-
-  document.getElementById('ev').textContent = new Date().getFullYear();
-
-  // Hamburger menü
-  const btn = document.getElementById('navbtn');
-  const nav = document.querySelector('.main-nav');
-  btn.addEventListener('click', function () {
-    nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
-  });
-
-  // Auth sáv
-  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
-  const authNav = document.getElementById('auth-nav');
-  if (user) {
-    authNav.innerHTML = `<span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span><a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>`;
-    document.getElementById('logout-btn').addEventListener('click', function(e) { e.preventDefault(); localStorage.removeItem('fp_user'); window.location.reload(); });
-  }
-
-  var API = '/api';
-  var ALL = [];
-  var MARKERS = {};
-  var ACTIVE_TYPE = 'mind';
-  var ACTIVE_COUNTY = 'mind';
-  var map;
-
+  var ALL = [], MARKERS = {}, ACTIVE_TYPE = 'mind', ACTIVE_COUNTY = 'mind', map;
   var TYPE_LABEL = { etterem: 'Étterem', food_truck: 'Food truck', tuzrako: 'Tűzrakóhely' };
   var TYPE_COLOR = { etterem: '#c2452d', food_truck: '#f5b82e', tuzrako: '#12514d' };
+  var user = JSON.parse(localStorage.getItem('fp_user') || 'null');
 
-  function isOwner(item) {
-    if (!user) return false;
-    return item.tulajdonos_id && String(item.tulajdonos_id) === String(user.id);
-  }
-
+  function isOwner(item) { return user && item.tulajdonos_id && String(item.tulajdonos_id) === String(user.id); }
   function ratingKey(id) { return 'fp_rate_' + id; }
-  function getMyRating(id) {
-    var v = parseInt(localStorage.getItem(ratingKey(id)) || '0', 10);
-    return (v >= 1 && v <= 5) ? v : 0;
-  }
-  function setMyRating(id, v) {
-    if (v === 0) localStorage.removeItem(ratingKey(id));
-    else localStorage.setItem(ratingKey(id), String(v));
-  }
+  function getMyRating(id) { var v = parseInt(localStorage.getItem(ratingKey(id)) || '0', 10); return (v >= 1 && v <= 5) ? v : 0; }
+  function setMyRating(id, v) { if (v === 0) localStorage.removeItem(ratingKey(id)); else localStorage.setItem(ratingKey(id), String(v)); }
 
-  var SITE_KEY = 'fp_rate_site';
-  function getSiteRating() {
-    var v = parseInt(localStorage.getItem(SITE_KEY) || '0', 10);
-    return (v >= 1 && v <= 5) ? v : 0;
-  }
-
-  // Geokódolás
-  var geoCache = {};
-  var slowChain = Promise.resolve();
-
+  var geoCache = {}, slowChain = Promise.resolve();
   function geocodeSlow(address) {
     if (!address) return Promise.resolve(null);
     var key = address.trim().toLowerCase();
@@ -227,79 +128,43 @@
     return new Promise(function (resolve) {
       slowChain = slowChain.then(function () {
         return new Promise(function (done) {
-          var url = 'https://nominatim.openstreetmap.org/search'
-            + '?format=json&limit=1&countrycodes=hu&q=' + encodeURIComponent(address);
+          var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=hu&q=' + encodeURIComponent(address);
           fetch(url, { headers: { 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
-            .then(function (arr) {
-              if (arr && arr.length) geoCache[key] = { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon) };
-              else geoCache[key] = null;
-            })
-            .catch(function () { geoCache[key] = null; })
-            .then(function () { setTimeout(done, 1100); });
+            .then(r => r.json()).then(arr => { if (arr && arr.length) geoCache[key] = { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon) }; else geoCache[key] = null; })
+            .catch(() => { geoCache[key] = null; }).then(() => { setTimeout(done, 1100); });
         });
       });
-      slowChain.then(function () { resolve(geoCache[key] || null); });
+      slowChain.then(() => { resolve(geoCache[key] || null); });
     });
   }
 
-  // Térkép inicializálás
   function initMap() {
     map = L.map('map', { center: [47.1625, 19.5033], zoom: 7, scrollWheelZoom: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> közreműködők'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
   }
 
-  // Csillagok HTML
   function starButtons(id, current, disabled) {
     var html = '<div class="star-row" data-id="' + id + '">';
     for (var i = 1; i <= 5; i++) {
-      html += '<button type="button" class="' + (i <= current ? 'on' : '') + '" data-v="' + i + '" '
-        + (disabled ? 'disabled' : '')
-        + ' aria-label="' + i + ' csillag">★</button>';
+      html += '<button type="button" class="' + (i <= current ? 'on' : '') + '" data-v="' + i + '" ' + (disabled ? 'disabled' : '') + '>★</button>';
     }
     html += '<span>' + (current ? current + ' / 5' : (disabled ? 'Saját hely' : 'nincs értékelés')) + '</span></div>';
     return html;
   }
-
-  function staticStars(v) {
-    var s = '';
-    for (var i = 1; i <= 5; i++) s += '<span class="' + (i <= v ? '' : 'off') + '">★</span>';
-    return '<span class="stars-static">' + s + '</span>';
-  }
+  function staticStars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += '<span class="' + (i <= v ? '' : 'off') + '">★</span>'; return '<span class="stars-static">' + s + '</span>'; }
 
   function popupHtml(item) {
-    var my = getMyRating(item.id);
-    var owner = isOwner(item);
-    return '<div class="map-popup">'
-      + '<span class="type" style="background:' + TYPE_COLOR[item.tipus] + '22;color:' + TYPE_COLOR[item.tipus] + '">'
-      + (TYPE_LABEL[item.tipus] || 'Hely') + '</span>'
-      + '<h4>' + escapeHtml(item.nev) + '</h4>'
-      + '<p><b>' + escapeHtml(item.helyszin || '') + '</b><br>' + escapeHtml(item.leiras || '') + '</p>'
-      + starButtons(item.id, my, owner)
-      + (owner ? '<p class="owner-note">Ez a te helyed, nem értékelheted.</p>' : '')
-      + '</div>';
+    var my = getMyRating(item.id), owner = isOwner(item);
+    return '<div class="map-popup"><span class="type" style="background:' + TYPE_COLOR[item.tipus] + '22;color:' + TYPE_COLOR[item.tipus] + '">' + (TYPE_LABEL[item.tipus] || 'Hely') + '</span><h4>' + escapeHtml(item.nev) + '</h4><p><b>' + escapeHtml(item.helyszin || '') + '</b><br>' + escapeHtml(item.leiras || '') + '</p>' + starButtons(item.id, my, owner) + (owner ? '<p class="owner-note">Ez a te helyed, nem értékelheted.</p>' : '') + '</div>';
   }
-
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
+  function escapeHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
   function addMarker(item, coords) {
     if (!coords) return;
     var color = TYPE_COLOR[item.tipus] || '#12514d';
-    var icon = L.divIcon({
-      className: '',
-      html: '<div style="width:18px;height:18px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',
-      iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10]
-    });
+    var icon = L.divIcon({ className: '', html: '<div style="width:18px;height:18px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
     var m = L.marker([coords.lat, coords.lon], { icon: icon, title: item.nev }).addTo(map).bindPopup(popupHtml(item));
-    m.on('popupopen', function () {
-      var row = m.getPopup().getElement().querySelector('.star-row');
-      if (row) bindStars(row);
-    });
+    m.on('popupopen', function () { var row = m.getPopup().getElement().querySelector('.star-row'); if (row) bindStars(row); });
     MARKERS[item.id] = m;
   }
 
@@ -309,142 +174,56 @@
       b.addEventListener('click', function () {
         if (!user) { alert('Az értékeléshez be kell jelentkezned!'); window.location.href = 'belepes.html'; return; }
         var v = parseInt(b.getAttribute('data-v'), 10);
-        
-        fetch(API + '/helyek/' + id + '/ertekeles', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
-          body: JSON.stringify({ stars: v })
-        })
-        .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
-        .then(function(res) {
-          if (!res.ok) { alert(res.j.error || 'Hiba történt.'); return; }
+        window.fpApi('PUT', '/helyek/' + id + '/ertekeles', { stars: v }).then(function(res) {
           setMyRating(id, v);
-          var item = ALL.find(function (x) { return String(x.id) === String(id); });
-          if (item) { item.avg = res.j.avg; item.count = res.j.count; item.myRating = res.j.myRating; }
+          var item = ALL.find(x => String(x.id) === String(id));
+          if (item) { item.avg = res.avg; item.count = res.count; item.myRating = res.myRating; }
           if (MARKERS[id]) MARKERS[id].setPopupContent(popupHtml(item));
           renderList();
-        })
-        .catch(function() {
-          setMyRating(id, v);
-          var item = ALL.find(function (x) { return String(x.id) === String(id); });
-          if (item && MARKERS[id]) MARKERS[id].setPopupContent(popupHtml(item));
-          renderList();
-        });
+        }).catch(function(err) { alert(err.message); });
       });
     });
   }
 
-  function countyMatches(item) {
-    if (ACTIVE_COUNTY === 'mind') return true;
-    return (item.megye || '').toLowerCase() === ACTIVE_COUNTY.toLowerCase()
-      || (item.helyszin || '').toLowerCase().indexOf(ACTIVE_COUNTY.toLowerCase()) > -1;
-  }
+  function countyMatches(item) { return ACTIVE_COUNTY === 'mind' || (item.megye || '').toLowerCase() === ACTIVE_COUNTY.toLowerCase() || (item.helyszin || '').toLowerCase().indexOf(ACTIVE_COUNTY.toLowerCase()) > -1; }
 
   function renderList() {
-    var box = document.getElementById('place-list');
-    box.innerHTML = '';
-    var items = ALL.filter(function (x) {
-      var typeOk = ACTIVE_TYPE === 'mind' || x.tipus === ACTIVE_TYPE;
-      return typeOk && countyMatches(x);
-    });
-
+    var box = document.getElementById('place-list'); box.innerHTML = '';
+    var items = ALL.filter(x => (ACTIVE_TYPE === 'mind' || x.tipus === ACTIVE_TYPE) && countyMatches(x));
     if (!items.length) { box.appendChild(el('p', '', 'Még nincs feltöltött hely ebben a kategóriában.')); return; }
-
+    
     items.forEach(function (item) {
       var card = el('article', 'place');
-      var badge = el('span', 'badge', TYPE_LABEL[item.tipus] || 'Hely');
-      badge.style.background = TYPE_COLOR[item.tipus] || '#12514d';
-      badge.style.color = '#fff';
-      card.appendChild(badge);
-
-      card.appendChild(el('h3', '', item.nev));
-      card.appendChild(el('div', 'where', item.helyszin || ''));
-      if (item.leiras) card.appendChild(el('p', '', item.leiras));
-
-      var my = getMyRating(item.id);
-      var owner = isOwner(item);
-
-      var rate = el('div', 'stars-static');
-      rate.innerHTML = staticStars(my) + ' <span style="font-size:.82rem;color:var(--teal-d);font-weight:700">'
-        + (my ? my + ' / 5' : (owner ? 'Saját hely' : 'még nem értékelted')) + '</span>';
-      card.appendChild(rate);
-
-      var row = document.createElement('div');
-      row.className = 'star-row';
-      row.setAttribute('data-id', item.id);
-      for (var i = 1; i <= 5; i++) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = i <= my ? 'on' : '';
-        b.setAttribute('data-v', i);
-        if (owner) b.disabled = true;
-        b.setAttribute('aria-label', i + ' csillag');
-        b.textContent = '★';
-        row.appendChild(b);
-      }
-      var lbl = document.createElement('span');
-      lbl.textContent = my ? my + ' / 5' : (owner ? 'Saját hely' : 'nincs értékelés');
-      row.appendChild(lbl);
-      card.appendChild(row);
-      if (!owner) bindStars(row);
-      else card.appendChild(el('p', 'owner-note', 'Ez a te helyed, nem értékelheted.'));
+      var badge = el('span', 'badge', TYPE_LABEL[item.tipus] || 'Hely'); badge.style.background = TYPE_COLOR[item.tipus] || '#12514d'; badge.style.color = '#fff'; card.appendChild(badge);
+      card.appendChild(el('h3', '', item.nev)); card.appendChild(el('div', 'where', item.helyszin || '')); if (item.leiras) card.appendChild(el('p', '', item.leiras));
+      
+      var my = getMyRating(item.id), owner = isOwner(item);
+      var rate = el('div', 'stars-static'); rate.innerHTML = staticStars(my) + ' <span style="font-size:.82rem;color:var(--teal-d);font-weight:700">' + (my ? my + ' / 5' : (owner ? 'Saját hely' : 'még nem értékelted')) + '</span>'; card.appendChild(rate);
+      
+      var row = document.createElement('div'); row.className = 'star-row'; row.setAttribute('data-id', item.id);
+      for (var i = 1; i <= 5; i++) { var b = document.createElement('button'); b.type = 'button'; b.className = i <= my ? 'on' : ''; b.setAttribute('data-v', i); if (owner) b.disabled = true; b.textContent = '★'; row.appendChild(b); }
+      var lbl = document.createElement('span'); lbl.textContent = my ? my + ' / 5' : (owner ? 'Saját hely' : 'nincs értékelés'); row.appendChild(lbl); card.appendChild(row);
+      if (!owner) bindStars(row); else card.appendChild(el('p', 'owner-note', 'Ez a te helyed, nem értékelheted.'));
 
       if (MARKERS[item.id]) {
-        var jump = el('button', 'delbtn', 'Mutasd a térképen');
-        jump.type = 'button';
-        jump.style.borderColor = 'var(--teal)';
-        jump.style.color = 'var(--teal-d)';
-        jump.addEventListener('click', function () {
-          var mk = MARKERS[item.id];
-          map.setView(mk.getLatLng(), 13);
-          mk.openPopup();
-          document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        var jump = el('button', 'delbtn', 'Mutasd a térképen'); jump.type = 'button'; jump.style.borderColor = 'var(--teal)'; jump.style.color = 'var(--teal-d)';
+        jump.addEventListener('click', function () { var mk = MARKERS[item.id]; map.setView(mk.getLatLng(), 13); mk.openPopup(); document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
         card.appendChild(jump);
       }
-
       box.appendChild(card);
     });
   }
 
-  function el(tag, cls, text) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text !== undefined) n.textContent = text;
-    return n;
-  }
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
 
   function loadAll() {
-    fetch(API + '/helyek')
-      .then(function (r) { return r.json(); })
-      .then(function (items) {
-        ALL = (items || []).map(function(it) {
-          if (!it.tipus && it.cat) {
-            var t = it.cat === 'ettermek' ? 'etterem' : (it.cat === 'trucks' ? 'food_truck' : 'tuzrako');
-            it.tipus = t;
-          }
-          return it;
-        });
-        bootMap();
-      })
-      .catch(function () {
-        ALL = JSON.parse(localStorage.getItem('fp_places') || '[]').map(function(it) {
-          if (!it.tipus && it.cat) {
-            var t = it.cat === 'ettermek' ? 'etterem' : (it.cat === 'trucks' ? 'food_truck' : 'tuzrako');
-            it.tipus = t;
-          }
-          return it;
-        });
-        bootMap();
-      });
+    window.fpApi('GET', '/helyek').then(function (items) { ALL = (items || []); bootMap(); }).catch(function () { ALL = []; bootMap(); });
   }
 
   function bootMap() {
     ALL.forEach(function (item) {
       if (item.lat && item.lon) addMarker(item, { lat: item.lat, lon: item.lon });
-      else if (item.helyszin) {
-        geocodeSlow(item.helyszin).then(function (c) { if (c) addMarker(item, c); });
-      }
+      else if (item.helyszin) geocodeSlow(item.helyszin).then(c => { if (c) addMarker(item, c); });
     });
     renderList();
   }
@@ -452,40 +231,16 @@
   document.querySelectorAll('#type-tabs [role="tab"]').forEach(function (t) {
     t.addEventListener('click', function () {
       document.querySelectorAll('#type-tabs [role="tab"]').forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
-      t.setAttribute('aria-selected', 'true');
-      ACTIVE_TYPE = t.getAttribute('data-type');
-      renderList();
+      t.setAttribute('aria-selected', 'true'); ACTIVE_TYPE = t.getAttribute('data-type'); renderList();
     });
   });
+  document.getElementById('county-select').addEventListener('change', function () { ACTIVE_COUNTY = this.value; renderList(); });
 
-  document.getElementById('county-select').addEventListener('change', function () {
-    ACTIVE_COUNTY = this.value;
-    renderList();
-  });
+  var SITE_KEY = 'fp_rate_site';
+  function paintSiteRate() { var v = parseInt(localStorage.getItem(SITE_KEY) || '0', 10); document.querySelectorAll('#site-rate button').forEach(b => { b.classList.toggle('on', parseInt(b.getAttribute('data-v'), 10) <= v); }); document.getElementById('site-rate-out').textContent = v ? v + ' / 5' : '–'; }
+  document.querySelectorAll('#site-rate button').forEach(function (b) { b.addEventListener('click', function () { localStorage.setItem(SITE_KEY, b.getAttribute('data-v')); paintSiteRate(); }); }); paintSiteRate();
 
-  function paintSiteRate() {
-    var v = getSiteRating();
-    document.querySelectorAll('#site-rate button').forEach(function (b) {
-      b.classList.toggle('on', parseInt(b.getAttribute('data-v'), 10) <= v);
-    });
-    document.getElementById('site-rate-out').textContent = v ? v + ' / 5' : '–';
-  }
-  document.querySelectorAll('#site-rate button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      localStorage.setItem(SITE_KEY, b.getAttribute('data-v'));
-      paintSiteRate();
-    });
-  });
-  paintSiteRate();
-
-  var tt = document.getElementById('totop');
-  if (tt) {
-    window.addEventListener('scroll', function () { tt.style.display = window.scrollY > 500 ? 'block' : 'none'; });
-    tt.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  }
-
-  initMap();
-  loadAll();
+  initMap(); loadAll();
 })();
 </script>
 </body>

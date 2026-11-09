@@ -6,118 +6,6 @@
 <title>Füst &amp; Parázs – BBQ, food truckok és szabadtéri sütögetés</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<style>
-  /* --- NAVBAR FIX --- */
-  nav.main-nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(23,26,29,.95);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255,255,255,.1);
-  }
-  .nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 22px;
-    max-width: 1240px;
-    margin: 0 auto;
-    flex-wrap: wrap;
-  }
-  .nav-links {
-    display: flex;
-    gap: 12px;
-    list-style: none;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-  }
-  .nav-links li a {
-    color: var(--chalk);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: background 0.2s;
-  }
-  .nav-links li a:hover {
-    background: rgba(255,255,255,.12);
-  }
-  .auth-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .btn-login {
-    color: var(--chalk);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.3);
-    transition: background 0.2s;
-  }
-  .btn-login:hover {
-    background: rgba(255,255,255,.1);
-  }
-  .btn-register {
-    background: var(--mustard);
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-    padding: 8px 16px;
-    border-radius: 999px;
-    transition: transform 0.2s;
-  }
-  .btn-register:hover {
-    transform: translateY(-2px);
-  }
-  .hamburger {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    flex-direction: column;
-    gap: 5px;
-    padding: 5px;
-  }
-  .hamburger span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background-color: var(--chalk);
-    border-radius: 3px;
-    transition: 0.3s;
-  }
-  @media (max-width: 1100px) {
-    .nav-links {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      order: 4;
-      background: var(--ink);
-      padding: 15px 0;
-      border-radius: 0 0 10px 10px;
-    }
-    .main-nav.open .nav-links {
-      display: flex;
-    }
-    .auth-buttons {
-      order: 2;
-      margin-left: auto;
-      margin-right: 15px;
-    }
-    .hamburger {
-      display: flex;
-      order: 3;
-    }
-  }
-</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -133,21 +21,14 @@
 <nav class="main-nav" aria-label="Főmenü">
   <div class="nav-container">
     <a class="logo" href="index.html">Füst &amp; Parázs</a>
-    
     <ul id="navlist" class="nav-links">
       <li><a href="index.html">Főoldal</a></li>
-      <li><a href="index.html#modszerek">Módszerek</a></li>
-      <li><a href="index.html#homerseklet">Hőfokok</a></li>
+      <li><a href="#modszerek">Módszerek</a></li>
+      <li><a href="#homerseklet">Hőfokok</a></li>
       <li><a href="recept.html">Receptek</a></li>
       <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
-
-    <div class="auth-buttons" id="auth-nav">
-      <!-- JS tölti ki -->
-      <a href="belepes.html" class="btn-login">Belépés</a>
-      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
-    </div>
-
+    <div class="auth-buttons" id="auth-nav"></div>
     <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
       <span></span><span></span><span></span>
     </button>
@@ -256,31 +137,5 @@
 </footer>
 
 <script src="js/app.js"></script>
-<script>
-  document.getElementById('ev').textContent = new Date().getFullYear();
-  
-  // Hamburger menü
-  const btn = document.getElementById('navbtn');
-  const nav = document.querySelector('.main-nav');
-  btn.addEventListener('click', function () {
-    nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
-  });
-
-  // Auth sáv frissítése
-  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
-  const authNav = document.getElementById('auth-nav');
-  if (user) {
-    authNav.innerHTML = `
-      <span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span>
-      <a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>
-    `;
-    document.getElementById('logout-btn').addEventListener('click', function(e) {
-      e.preventDefault();
-      localStorage.removeItem('fp_user');
-      window.location.reload();
-    });
-  }
-</script>
 </body>
 </html>
