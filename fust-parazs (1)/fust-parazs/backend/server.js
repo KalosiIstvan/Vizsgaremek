@@ -20,18 +20,31 @@ const pool = mysql.createPool({
   connectionLimit: 10
 });
 
-/* ---------- konstansok, segédek ---------- */
-// A frontend a régi kategórianeveket használja, az adatbázisban magyar ENUM értékek vannak.
+/* ---------- Konstansok, segédek ---------- */
 const TIPUS = { ettermek: 'etterem', trucks: 'food_truck', tuz: 'tuzrako' };
-const KATEGORIAK = ['bbq', 'steak', 'egyeb'];
 const MAX_HELY_KLIENSENKENT = 20;
 
 class HttpError extends Error {
   constructor(status, msg) { super(msg); this.status = status; }
 }
+
 const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const kerekit = (n) => (n == null ? 0 : Math.round(Number(n) * 10) / 10);
 
+// Jelszó hashelés (beépített crypto scrypt, így nem kell extra csomag)
+function hashJelszo(jelszo) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(jelszo, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+function ellenorizJelszo(jelszo, tarolt) {
+  if (!tarolt) return false;
+  const [salt, hash] = tarolt.split(':');
+  const calc = crypto.scryptSync(jelszo, salt, 64).toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(calc, 'hex'), Buffer.from(hash, 'hex'));
+}
+
+// PIN hashelés (food truckokhoz)
 function hashPin(pin) {
   const salt = crypto.randomBytes(16);
   return salt.toString('hex') + ':' + crypto.scryptSync(pin, salt, 32).toString('hex');
@@ -43,7 +56,7 @@ function checkPin(pin, stored) {
   return crypto.timingSafeEqual(calc, Buffer.from(h, 'hex'));
 }
 
-// Hibás PIN-ek korlátozása (memóriában): 5 hibás kísérlet / 10 perc
+// Hibás PIN korlátozás
 const hibak = new Map();
 const zarolt = (k) => { const f = hibak.get(k); return !!f && f.n >= 5 && Date.now() - f.t < 600000; };
 const hibasPin = (k) => {
@@ -57,23 +70,41 @@ function pinEllenorzes(req, hely, pin) {
   if (!checkPin(String(pin ?? ''), hely.pin_hash)) { hibasPin(kulcs); throw new HttpError(403, 'Hibás PIN.'); }
 }
 
-/* ---------- helyek lekérdezése ---------- */
-async function helyekLekerdezese(feltetel, parameterek, kliens) {
+/* ---------- Auth Middleware ---------- */
+// A frontend az x-user-id fejlécben küldi a bejelentkezett felhasználó ID-jét
+function getBejelentkezettUser(req) {
+  const userId = req.get('x-user-id');
+  if (!userId) return null;
+  return Number(userId);
+}
+function requireAuth(req, res, next) {
+  const uid = getBejelentkezettUser(req);
+  if (!uid) throw new HttpError(401, 'Bejelentkezés szükséges.');
+  req.userId = uid;
+  next();
+}
+
+/* ---------- Helyek lekérdezése ---------- */
+async function helyekLekerdezese(tipus, felhasznaloId) {
+  let where = '1=1';
+  let params = [];
+  if (tipus) {
+    where += ' AND h.tipus = ?';
+    params.push(tipus);
+  }
+
   const [sorok] = await pool.query(
     `SELECT h.*,
        (SELECT AVG(e.csillag) FROM ertekelesek e WHERE e.hely_id = h.id) AS atlag,
        (SELECT COUNT(*)       FROM ertekelesek e WHERE e.hely_id = h.id) AS darab,
-       (SELECT e.csillag      FROM ertekelesek e WHERE e.hely_id = h.id AND e.kliens_id = ?) AS sajat,
-       (SELECT GROUP_CONCAT(k.kod ORDER BY k.id)
-          FROM hely_kategoriak hk JOIN kategoriak k ON k.id = hk.kategoria_id
-         WHERE hk.hely_id = h.id) AS kategoriak
+       (SELECT e.csillag      FROM ertekelesek e WHERE e.hely_id = h.id AND e.felhasznalo_id = ?) AS sajat
      FROM helyek h
-     WHERE ${feltetel}
+     WHERE ${where}
      ORDER BY h.sorszam`,
-    [kliens || '', ...parameterek]
+    [felhasznaloId || 0, ...params]
   );
 
-  // A regisztrált food truckok megállói
+  // Food truck megállók
   const truckIdk = sorok.filter((s) => s.tipus === 'food_truck' && s.regisztralt).map((s) => s.id);
   const megallok = new Map();
   if (truckIdk.length) {
@@ -88,17 +119,17 @@ async function helyekLekerdezese(feltetel, parameterek, kliens) {
     }
   }
 
-  // A JSON mezők nevei a frontenddel egyeznek (where, desc, kat, ...).
+  // Visszaadjuk a frontend által elvárt formátumban
   return sorok.map((s) => {
     const o = {
       id: s.id,
-      kat: s.kategoriak || 'egyeb',
-      name: s.nev,
-      where: s.helyszin,
-      desc: s.leiras,
-      reg: !!s.regisztralt,
-      mine: !!kliens && s.tulajdonos_kliens === kliens,
-      hasPin: !!s.pin_hash,
+      tipus: s.tipus,
+      nev: s.nev,
+      helyszin: s.helyszin,
+      megye: s.megye,
+      leiras: s.leiras,
+      regisztralt: !!s.regisztralt,
+      tulajdonos_id: s.tulajdonos_id,
       avg: kerekit(s.atlag),
       count: Number(s.darab) || 0,
       myRating: s.sajat || 0
@@ -107,41 +138,86 @@ async function helyekLekerdezese(feltetel, parameterek, kliens) {
     return o;
   });
 }
-async function egyHely(id, kliens) {
-  const [h] = await helyekLekerdezese('h.id = ?', [id], kliens);
-  if (!h) throw new HttpError(404, 'Nem található.');
-  return h;
+
+async function egyHely(id, felhasznaloId) {
+  const [sorok] = await pool.query('SELECT tipus FROM helyek WHERE id = ?', [id]);
+  if (!sorok.length) throw new HttpError(404, 'Nem található.');
+  const lista = await helyekLekerdezese(sorok[0].tipus, felhasznaloId);
+  const talalat = lista.find(h => h.id === id);
+  if (!talalat) throw new HttpError(404, 'Nem található.');
+  return talalat;
 }
+
 async function nyersHely(id) {
   const [[hely]] = await pool.query('SELECT * FROM helyek WHERE id = ?', [id]);
   if (!hely) throw new HttpError(404, 'Nem található.');
   return hely;
 }
 
-/* ---------- API ---------- */
+/* ---------- API Útvonalak ---------- */
 const api = express.Router();
-const kliensAzonosito = (req) => clean(req.get('x-client-id'), 64);
 
-// GET /api/helyek?cat=ettermek|trucks|tuz
-api.get('/helyek', async (req, res) => {
-  const tipus = TIPUS[req.query.cat];
-  if (!tipus) throw new HttpError(400, 'Érvénytelen kategória.');
-  res.json(await helyekLekerdezese('h.tipus = ?', [tipus], kliensAzonosito(req)));
+// --- AUTH ---
+api.post('/auth/register', async (req, res) => {
+  const { nev, email, jelszo, szerep } = req.body || {};
+  if (!nev || !email || !jelszo) throw new HttpError(400, 'Minden mező kötelező.');
+  
+  const validSzerep = ['user', 'etterem', 'truck', 'mindketto'].includes(szerep) ? szerep : 'user';
+  
+  const hash = hashJelszo(jelszo);
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO felhasznalok (nev, email, jelszo_hash, szerep) VALUES (?, ?, ?, ?)',
+      [clean(nev, 60), clean(email, 100), hash, validSzep]
+    );
+    res.status(201).json({ 
+      message: 'Sikeres regisztráció', 
+      user: { id: result.insertId, nev, email, szerep: validSzerep } 
+    });
+  } catch (e) {
+    if (e.code === 'ER_DUP_ENTRY') throw new HttpError(409, 'Ez az email már regisztrálva van.');
+    throw e;
+  }
 });
 
-// POST /api/helyek  (új hely / regisztráció)
-api.post('/helyek', async (req, res) => {
-  const kliens = kliensAzonosito(req);
-  if (kliens.length < 8) throw new HttpError(400, 'Hiányzó kliensazonosító.');
+api.post('/auth/login', async (req, res) => {
+  const { email, jelszo } = req.body || {};
+  if (!email || !jelszo) throw new HttpError(400, 'Email és jelszó kötelező.');
+
+  const [[user]] = await pool.query('SELECT * FROM felhasznalok WHERE email = ?', [clean(email, 100)]);
+  if (!user || !ellenorizJelszo(jelszo, user.jelszo_hash)) {
+    throw new HttpError(401, 'Hibás email vagy jelszó.');
+  }
+
+  res.json({ 
+    message: 'Sikeres belépés', 
+    user: { id: user.id, nev: user.nev, email: user.email, szerep: user.szerep } 
+  });
+});
+
+// --- HELYEK ---
+// GET /api/helyek (opcionális ?cat=)
+api.get('/helyek', async (req, res) => {
+  const tipus = TIPUS[req.query.cat] || null;
+  const uid = getBejelentkezettUser(req);
+  res.json(await helyekLekerdezese(tipus, uid));
+});
+
+// POST /api/helyek (Új hely feltöltése - Bejelentkezés kötelező)
+api.post('/helyek', requireAuth, async (req, res) => {
   const b = req.body || {};
   const tipus = TIPUS[b.cat];
   if (!tipus) throw new HttpError(400, 'Érvénytelen kategória.');
-  const nev = clean(b.name, 60), helyszin = clean(b.where, 90);
+  
+  const nev = clean(b.name, 60);
+  const helyszin = clean(b.where, 90);
+  const megye = clean(b.county, 40) || 'Budapest';
   if (!nev || !helyszin) throw new HttpError(400, 'A név és a helyszín kötelező.');
-  const kategoria = KATEGORIAK.includes(b.kat) ? b.kat : 'egyeb';
-  const leiras = clean(b.desc, 240) || (b.registered ? 'Regisztrált vendéglátóhely.' : 'Saját hozzáadott hely.');
 
-  const [[{ db }]] = await pool.query('SELECT COUNT(*) AS db FROM helyek WHERE tulajdonos_kliens = ?', [kliens]);
+  const leiras = clean(b.desc, 240) || 'Regisztrált vendéglátóhely.';
+
+  // Limit ellenőrzés
+  const [[{ db }]] = await pool.query('SELECT COUNT(*) AS db FROM helyek WHERE tulajdonos_id = ?', [req.userId]);
   if (db >= MAX_HELY_KLIENSENKENT) throw new HttpError(429, 'Elérted a hozzáadható helyek maximumát.');
 
   let pinHash = null;
@@ -155,13 +231,9 @@ api.post('/helyek', async (req, res) => {
   try {
     await conn.beginTransaction();
     await conn.query(
-      `INSERT INTO helyek (id, tipus, nev, helyszin, leiras, regisztralt, tulajdonos_kliens, pin_hash)
-       VALUES (?,?,?,?,?,?,?,?)`,
-      [id, tipus, nev, helyszin, leiras, b.registered ? 1 : 0, kliens, pinHash]
-    );
-    await conn.query(
-      'INSERT INTO hely_kategoriak (hely_id, kategoria_id) SELECT ?, id FROM kategoriak WHERE kod = ?',
-      [id, kategoria]
+      `INSERT INTO helyek (id, tipus, nev, helyszin, megye, leiras, regisztralt, tulajdonos_id, pin_hash)
+       VALUES (?,?,?,?,?,?,?,?,?)`,
+      [id, tipus, nev, helyszin, megye, leiras, 1, req.userId, pinHash]
     );
     if (tipus === 'food_truck') {
       await conn.query('INSERT INTO megallok (hely_id, helyszin, mikor) VALUES (?,?,?)',
@@ -174,83 +246,117 @@ api.post('/helyek', async (req, res) => {
   } finally {
     conn.release();
   }
-  res.status(201).json(await egyHely(id, kliens));
+  res.status(201).json(await egyHely(id, req.userId));
 });
 
-// DELETE /api/helyek/:id
-api.delete('/helyek/:id', async (req, res) => {
-  const kliens = kliensAzonosito(req);
+// DELETE /api/helyek/:id (Csak a tulajdonos törölheti)
+api.delete('/helyek/:id', requireAuth, async (req, res) => {
   const hely = await nyersHely(req.params.id);
-  if (hely.pin_hash) pinEllenorzes(req, hely, (req.body || {}).pin);
-  else if (!hely.tulajdonos_kliens || hely.tulajdonos_kliens !== kliens) {
+  
+  if (hely.tulajdonos_id !== req.userId) {
     throw new HttpError(403, 'Ezt a helyet nem törölheted.');
   }
+  
   await pool.query('DELETE FROM helyek WHERE id = ?', [hely.id]);
   res.json({ ok: true });
 });
 
-// POST /api/helyek/:id/megallok  (food truck új helyszíne, PIN kell)
-api.post('/helyek/:id/megallok', async (req, res) => {
+// POST /api/helyek/:id/megallok (Food truck új helyszíne)
+api.post('/helyek/:id/megallok', requireAuth, async (req, res) => {
   const hely = await nyersHely(req.params.id);
-  if (hely.tipus !== 'food_truck' || !hely.pin_hash) throw new HttpError(404, 'Nem található.');
-  const b = req.body || {};
-  pinEllenorzes(req, hely, b.pin);
-  const helyszin = clean(b.place, 90);
+  if (hely.tipus !== 'food_truck') throw new HttpError(404, 'Nem található.');
+  if (hely.tulajdonos_id !== req.userId) throw new HttpError(403, 'Nincs jogosultságod.');
+  
+  const helyszin = clean((req.body || {}).place, 90);
   if (!helyszin) throw new HttpError(400, 'Add meg az új helyszínt.');
+  
   await pool.query('INSERT INTO megallok (hely_id, helyszin, mikor) VALUES (?,?,?)',
-    [hely.id, helyszin, clean(b.when, 40) || 'frissítve']);
-  // csak a legutóbbi 8 megálló marad
+    [hely.id, helyszin, clean((req.body || {}).when, 40) || 'frissítve']);
+    
+  // Csak az utolsó 8 marad
   await pool.query(
     `DELETE FROM megallok WHERE hely_id = ? AND id NOT IN
        (SELECT id FROM (SELECT id FROM megallok WHERE hely_id = ? ORDER BY id DESC LIMIT 8) AS legutobbi)`,
     [hely.id, hely.id]
   );
-  const frissitett = await egyHely(hely.id, kliensAzonosito(req));
+  
+  const frissitett = await egyHely(hely.id, req.userId);
   res.json({ stops: frissitett.stops || [] });
 });
 
-// PUT /api/helyek/:id/ertekeles   { stars: 0-5 }   (0 = értékelés törlése)
-api.put('/helyek/:id/ertekeles', async (req, res) => {
-  const kliens = kliensAzonosito(req);
-  if (kliens.length < 8) throw new HttpError(400, 'Hiányzó kliensazonosító.');
+// PUT /api/helyek/:id/ertekeles (Értékelés - Saját helyet tilos!)
+api.put('/helyek/:id/ertekeles', requireAuth, async (req, res) => {
   const hely = await nyersHely(req.params.id);
   const csillag = Number((req.body || {}).stars);
-  if (!Number.isInteger(csillag) || csillag < 0 || csillag > 5) {
-    throw new HttpError(400, 'Az értékelés 0 és 5 közötti szám.');
+
+  if (!Number.isInteger(csillag) || csillag < 1 || csillag > 5) {
+    throw new HttpError(400, 'Az értékelés 1 és 5 közötti szám.');
   }
-  if (csillag === 0) {
-    await pool.query('DELETE FROM ertekelesek WHERE hely_id = ? AND kliens_id = ?', [hely.id, kliens]);
-  } else {
-    await pool.query(
-      `INSERT INTO ertekelesek (hely_id, kliens_id, csillag) VALUES (?,?,?)
-       ON DUPLICATE KEY UPDATE csillag = VALUES(csillag)`,
-      [hely.id, kliens, csillag]
-    );
+
+  // Tiltás: ne értékelhesse a saját helyét!
+  if (hely.tulajdonos_id === req.userId) {
+    throw new HttpError(403, 'A saját helyedet nem értékelheted.');
   }
+
+  await pool.query(
+    `INSERT INTO ertekelesek (hely_id, felhasznalo_id, csillag) VALUES (?,?,?)
+     ON DUPLICATE KEY UPDATE csillag = VALUES(csillag)`,
+    [hely.id, req.userId, csillag]
+  );
+
   const [[r]] = await pool.query(
     `SELECT AVG(csillag) AS atlag, COUNT(*) AS darab,
-            (SELECT csillag FROM ertekelesek WHERE hely_id = ? AND kliens_id = ?) AS sajat
+            (SELECT csillag FROM ertekelesek WHERE hely_id = ? AND felhasznalo_id = ?) AS sajat
        FROM ertekelesek WHERE hely_id = ?`,
-    [hely.id, kliens, hely.id]
+    [hely.id, req.userId, hely.id]
   );
+  
   res.json({ avg: kerekit(r.atlag), count: Number(r.darab) || 0, myRating: r.sajat || 0 });
 });
 
-// GET /api/homersekletek
+// --- RECEPTEK ---
+// GET /api/receptek
+api.get('/receptek', async (req, res) => {
+  const [sorok] = await pool.query(`
+    SELECT r.*, f.nev AS feltolto_nev
+    FROM receptek r
+    LEFT JOIN felhasznalok f ON f.id = r.feltolto_id
+    ORDER BY r.feltoltve DESC
+  `);
+  res.json(sorok);
+});
+
+// POST /api/receptek (Bejelentkezés kötelező)
+api.post('/receptek', requireAuth, async (req, res) => {
+  const { cim, kat, ido_perc, hozzavalok, lepesek } = req.body || {};
+  
+  if (!cim || !hozzavalok || !lepesek) {
+    throw new HttpError(400, 'A cím, a hozzávalók és a lépések kötelezőek.');
+  }
+  
+  const validKat = ['marha', 'sertes', 'csirke', 'hal', 'vega', 'egyeb'].includes(kat) ? kat : 'egyeb';
+  const ido = Number(ido_perc) || 60;
+
+  const [result] = await pool.query(
+    `INSERT INTO receptek (cim, kat, ido_perc, hozzavalok, lepesek, feltolto_id)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [clean(cim, 80), validKat, ido, hozzavalok, lepesek, req.userId]
+  );
+  
+  res.status(201).json({ id: result.insertId, message: 'Recept sikeresen mentve.' });
+});
+
+// --- STATIKUS ADATOK (Főoldalhoz) ---
 api.get('/homersekletek', async (req, res) => {
   const [sorok] = await pool.query('SELECT hus, cel, homerseklet FROM homersekletek ORDER BY sorszam');
   res.json(sorok);
 });
 
-// GET /api/husok  (kalkulátor)
 api.get('/husok', async (req, res) => {
-  const [sorok] = await pool.query(
-    'SELECT id, nev, teljes_nev, gramm_fo, sutesi_ido FROM husok ORDER BY sorszam'
-  );
+  const [sorok] = await pool.query('SELECT id, nev, teljes_nev, gramm_fo, sutesi_ido FROM husok ORDER BY sorszam');
   res.json(sorok);
 });
 
-// GET /api/kviz  -> [{ id, kerdes, valaszok: [szöveg, ...], helyes: index }]
 api.get('/kviz', async (req, res) => {
   const [kerdesek] = await pool.query('SELECT id, kerdes FROM kviz_kerdesek ORDER BY sorszam');
   const [valaszok] = await pool.query('SELECT id, kerdes_id, szoveg, helyes FROM kviz_valaszok ORDER BY id');
@@ -260,7 +366,6 @@ api.get('/kviz', async (req, res) => {
   }));
 });
 
-// GET /api/gyik
 api.get('/gyik', async (req, res) => {
   const [sorok] = await pool.query('SELECT kerdes, valasz FROM gyik ORDER BY sorszam');
   res.json(sorok);
@@ -268,14 +373,14 @@ api.get('/gyik', async (req, res) => {
 
 api.use((req, res) => { throw new HttpError(404, 'Ismeretlen végpont.'); });
 
-/* ---------- szerver ---------- */
+/* ---------- Szerver inicializálás ---------- */
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50kb' }));
 app.use('/api', api);
 app.use(express.static(FRONTEND));
 
-// Hibakezelő (az Express 5 az aszinkron hibákat is ide irányítja)
+// Hibakezelő
 app.use((err, req, res, next) => {
   if (err instanceof HttpError) return res.status(err.status).json({ error: err.message });
   if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Túl nagy kérés.' });
@@ -286,9 +391,11 @@ app.use((err, req, res, next) => {
 
 try {
   await pool.query('SELECT 1');
+  console.log('Sikeres adatbázis kapcsolat.');
 } catch (e) {
   console.error('Nem sikerült csatlakozni a MySQL-hez:', e.message);
-  console.error('Ellenőrizd a .env fájlt, és futtasd: npm run db:setup');
+  console.error('Ellenőrizd a .env fájlt és a futtatott SQL-t!');
   process.exit(1);
 }
+
 app.listen(PORT, () => console.log(`Füst & Parázs fut: http://localhost:${PORT}`));

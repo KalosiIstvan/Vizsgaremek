@@ -6,6 +6,118 @@
 <title>Füst &amp; Parázs – BBQ, food truckok és szabadtéri sütögetés</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* --- NAVBAR FIX --- */
+  nav.main-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(23,26,29,.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 22px;
+    max-width: 1240px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .nav-links {
+    display: flex;
+    gap: 12px;
+    list-style: none;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-links li a {
+    color: var(--chalk);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .nav-links li a:hover {
+    background: rgba(255,255,255,.12);
+  }
+  .auth-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-login {
+    color: var(--chalk);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.3);
+    transition: background 0.2s;
+  }
+  .btn-login:hover {
+    background: rgba(255,255,255,.1);
+  }
+  .btn-register {
+    background: var(--mustard);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 999px;
+    transition: transform 0.2s;
+  }
+  .btn-register:hover {
+    transform: translateY(-2px);
+  }
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+  }
+  .hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--chalk);
+    border-radius: 3px;
+    transition: 0.3s;
+  }
+  @media (max-width: 1100px) {
+    .nav-links {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      order: 4;
+      background: var(--ink);
+      padding: 15px 0;
+      border-radius: 0 0 10px 10px;
+    }
+    .main-nav.open .nav-links {
+      display: flex;
+    }
+    .auth-buttons {
+      order: 2;
+      margin-left: auto;
+      margin-right: 15px;
+    }
+    .hamburger {
+      display: flex;
+      order: 3;
+    }
+  }
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -18,24 +130,27 @@
 <circle cx="150" cy="108" r="7" fill="#f3d9a8" opacity=".9"/>
 </symbol></defs></svg>
 
-<nav aria-label="Főmenü">
-  <div class="wrap">
-    <a class="logo" href="#top">Füst &amp; Parázs</a>
-    <button id="navbtn" type="button" aria-expanded="false" aria-controls="navlist">Menü</button>
-    <ul id="navlist">
-      <li><a href="#bevezeto">Bevezető</a></li>
-      <li><a href="#modszerek">Módszerek</a></li>
-      <li><a href="#homerseklet">Hőfokok</a></li>
-      <li><a href="#foodtruck">Food truck</a></li>
-      <li><a href="#ettermek">Éttermek</a></li>
-      <li><a href="#trucklista">Truckok</a></li>
-      <li><a href="#regisztracio">Regisztráció</a></li>
-      <li><a href="#tuzrako">Tűzrakók</a></li>
-      <li><a href="#eszkozok">Eszközök</a></li>
-      <li><a href="#tippek">Tippek</a></li>
-      <li><a href="#recept">Recept</a></li>
-      <li><a href="#gyik">GYIK</a></li>
+<nav class="main-nav" aria-label="Főmenü">
+  <div class="nav-container">
+    <a class="logo" href="index.html">Füst &amp; Parázs</a>
+    
+    <ul id="navlist" class="nav-links">
+      <li><a href="index.html">Főoldal</a></li>
+      <li><a href="index.html#modszerek">Módszerek</a></li>
+      <li><a href="index.html#homerseklet">Hőfokok</a></li>
+      <li><a href="recept.html">Receptek</a></li>
+      <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
+
+    <div class="auth-buttons" id="auth-nav">
+      <!-- JS tölti ki -->
+      <a href="belepes.html" class="btn-login">Belépés</a>
+      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
+    </div>
+
+    <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -69,7 +184,6 @@
   <div class="wrap">
     <h2>Miért a tűz hozza össze az embereket?</h2>
     <p>A tűzön sütött étel az emberiség egyik legrégebbi közös élménye. A <b>barbecue</b> ma már több, mint egy főzési mód: életérzés, hagyomány és közösség. Ez a weboldal három, egymással szorosan összefüggő témát mutat be: a BBQ technikáit, a food truck vállalkozások működését és a biztonságos szabadtéri sütögetést.</p>
-    <p>A BBQ szó eredete a karibi taíno népek <i>barbacoa</i> nevű főzési módjához vezethető vissza, amely zöld ágakból épített rácson, lassú füstön készült. Az amerikai déli államokban ebből alakult ki a mai lassú, füstös sütési kultúra. Magyarországon a bográcsozás és a szalonnasütés mellett az elmúlt években a grillezés és a street food fesztiválok tették népszerűvé.</p>
     <div class="facts">
       <div class="fact"><b>Low &amp; slow</b>Alacsony hő, hosszú sütési idő: a BBQ alapelve.</div>
       <div class="fact"><b>Street food</b>Gyors kiszolgálás, mozgó konyha, helyszínről helyszínre.</div>
@@ -81,41 +195,22 @@
 <section id="modszerek" class="alt">
   <div class="wrap">
     <h2>Sütési módszerek</h2>
-    <p>Nem minden tűz egyforma. Válassz fület, és nézd meg, mikor melyik módszert érdemes használni.</p>
-    <div class="tabs" role="tablist" aria-label="Sütési módszerek">
+    <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" aria-controls="p1" id="t1">Grillezés</button>
       <button role="tab" aria-selected="false" aria-controls="p2" id="t2">Smoker (füstölés)</button>
       <button role="tab" aria-selected="false" aria-controls="p3" id="t3">Bogrács és nyárs</button>
     </div>
     <div class="panel" role="tabpanel" id="p1" aria-labelledby="t1">
       <h3>Grillezés: közvetlen hő</h3>
-      <span class="tag">200–260 °C</span><span class="tag">10–30 perc</span>
       <p>Az étel közvetlenül a parázs vagy a gázláng fölött készül. Gyors, intenzív sütés, amely szép kérget és pirítást ad.</p>
-      <ul>
-        <li><b>Jó erre:</b> steak, hamburger, kolbász, zöldségek, csirkemell.</li>
-        <li><b>Eszköz:</b> faszenes grill (Kamado, Weber), gázgrill, kerti grillrács.</li>
-        <li><b>Trükk:</b> alakíts ki egy forró és egy hűvösebb zónát, így nem ég meg a hús.</li>
-      </ul>
     </div>
     <div class="panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
       <h3>Smoker: közvetett hő és füst</h3>
-      <span class="tag">107–135 °C</span><span class="tag">4–16 óra</span>
-      <p>A hús nem a tűz fölött, hanem mellette sül, miközben fafüst veszi körül. A kötőszövet lassan zselatinná alakul, ettől lesz a hús omlós.</p>
-      <ul>
-        <li><b>Jó erre:</b> brisket (marhamell), pulled pork, oldalas, egész csirke.</li>
-        <li><b>Fafajták:</b> hikori (erős), tölgy (kiegyensúlyozott), gyümölcsfák (enyhe, édeskés).</li>
-        <li><b>Trükk:</b> az állandó hőmérséklet fontosabb a pontos idő követésénél.</li>
-      </ul>
+      <p>A hús nem a tűz fölött, hanem mellette sül, miközben fafüst veszi körül.</p>
     </div>
     <div class="panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
-      <h3>Bogrács és nyárs: magyar tábortűz</h3>
-      <span class="tag">nyílt láng</span><span class="tag">hagyományos</span>
-      <p>A szabadtéri főzés hazai klasszikusai. A bográcsban lassan főnek az ízek, a nyárson és a nyársforgatón pedig a hús a parázs mellett forog.</p>
-      <ul>
-        <li><b>Jó erre:</b> gulyás, halászlé, pörkölt, szalonna, nyárson sült csirke.</li>
-        <li><b>Eszköz:</b> bogrács, háromláb, nyárs, tűzrakó hely.</li>
-        <li><b>Trükk:</b> bükk- vagy akácfa ad tartós, egyenletes parazsat.</li>
-      </ul>
+      <h3>Bogrács és nyárs</h3>
+      <p>A szabadtéri főzés hazai klasszikusai.</p>
     </div>
   </div>
 </section>
@@ -123,226 +218,69 @@
 <section id="homerseklet">
   <div class="wrap">
     <h2>Belső hőmérséklet: mikor kész a hús?</h2>
-    <p>A legbiztosabb módszer a húshőmérő. Az alábbi értékek általános ajánlások, mindig a hús legvastagabb részén mérj, csonttól távol.</p>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Hús</th><th>Cél</th><th>Belső hőmérséklet</th></tr></thead>
         <tbody>
-          <tr><td>Csirke, pulyka</td><td>Átsült, biztonságos</td><td>74 °C</td></tr>
-          <tr><td>Sertésszelet, sertéskaraj</td><td>Átsült, szaftos</td><td>63–70 °C</td></tr>
+          <tr><td>Csirke, pulyka</td><td>Átsült</td><td>74 °C</td></tr>
           <tr><td>Marhahús (steak)</td><td>Medium</td><td>57–63 °C</td></tr>
-          <tr><td>Darált hús (burger)</td><td>Átsült</td><td>71 °C</td></tr>
-          <tr><td>Pulled pork (sertéslapocka)</td><td>Szálaira omlik</td><td>93–96 °C</td></tr>
-          <tr><td>Brisket (marhamell)</td><td>Omlós</td><td>93–96 °C</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="doneness">
-      <svg viewBox="0 0 260 190" role="img" aria-label="Steak keresztmetszete">
-        <rect x="14" y="20" width="232" height="150" rx="34" fill="#4a1f14" stroke="#231f1c" stroke-width="5"/>
-        <rect id="d-band" x="30" y="36" width="200" height="118" rx="24" fill="#b98b73"/>
-        <rect id="d-core" x="60" y="62" width="140" height="66" rx="18" fill="#c4453a"/>
-        <path d="M30 28H230" stroke="#f3d9a8" stroke-width="6" stroke-linecap="round" opacity=".8"/>
-      </svg>
-      <div>
-        <h3>Steak átsütöttség</h3>
-        <input type="range" id="d-lvl" min="1" max="5" value="2" aria-label="Átsütöttség">
-        <div class="dlabels"><span>Véres</span><span>Közepes</span><span>Átsült</span></div>
-        <p class="dres" id="d-out"></p>
-      </div>
+  </div>
+</section>
+
+<section id="hub" class="alt">
+  <div class="wrap">
+    <h2>Merre tovább?</h2>
+    <div class="cards">
+      <article class="place">
+        <h3>Helyek térképen</h3>
+        <p>Nézd meg az összes regisztrált éttermet, food truckot és tűzrakóhelyet.</p>
+        <a href="helyek.html" class="btn" style="margin-top:auto; text-align:center;">Térkép megnyitása</a>
+      </article>
+      <article class="place">
+        <h3>Receptajánló</h3>
+        <p>Nézd meg a közösség legjobb fogásait.</p>
+        <a href="recept.html" class="btn" style="margin-top:auto; text-align:center;">Receptek</a>
+      </article>
     </div>
-  </div>
-</section>
-
-<section id="foodtruck" class="alt">
-  <div class="wrap">
-    <h2>A food truck: étterem négy keréken</h2>
-    <p>A food truck olyan átalakított jármű vagy utánfutó, amelyben teljes értékű mobil konyha működik. Kisebb indulótőkével indítható, mint egy étterem, és oda viheted az ételt, ahol a vendégek vannak: fesztiválokra, rendezvényekre, irodaparkokba.</p>
-    <div class="two">
-      <div class="menuboard" aria-label="Példa BBQ food truck étlap">
-        <h3>Mai étlap</h3>
-        <div class="row"><span>Pulled pork burger</span><i></i><span>2 790 Ft</span></div>
-        <small>füstölt lapocka, coleslaw, BBQ szósz</small>
-        <div class="row"><span>Brisket szendvics</span><i></i><span>3 290 Ft</span></div>
-        <small>12 órán át füstölt marhamell</small>
-        <div class="row"><span>Füstös oldalas</span><i></i><span>3 490 Ft</span></div>
-        <small>fél adag, kukoricával</small>
-        <div class="row"><span>Hasábburgonya</span><i></i><span>990 Ft</span></div>
-        <div class="row"><span>Limonádé</span><i></i><span>690 Ft</span></div>
-        <small>Az árak szemléltető jellegűek.</small>
-      </div>
-      <div>
-        <h3>Mire kell figyelni az indulásnál?</h3>
-        <ul class="checklist">
-          <li><b>Koncepció:</b> kevés, de kiváló tétel. A rövid étlap gyorsabb kiszolgálást és kisebb pazarlást jelent.</li>
-          <li><b>Jármű és felszerelés:</b> hűtés, tűzbiztos kialakítás, gáz- és áramellátás, kézmosási lehetőség.</li>
-          <li><b>Engedélyek:</b> élelmiszer-vállalkozás nyilvántartásba vétele, higiéniai előírások (HACCP), helyszín- és közterület-használati engedély. Aktuális szabályokról a területileg illetékes hatóságnál érdemes tájékozódni.</li>
-          <li><b>Hely és időzítés:</b> fesztiválok, piacok, rendezvények; a jó helyszín gyakran fontosabb, mint a menü bővítése.</li>
-          <li><b>Marketing:</b> a közösségi média a legfőbb csatorna, ezért az aktuális helyszínt és nyitvatartást mindig jelezni kell.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="ettermek">
-  <div class="wrap">
-    <div class="steakdiv" aria-hidden="true"><svg viewBox="0 0 210 160"><use href="#steak"/></svg></div>
-    <h2>BBQ és steak éttermek, ahol te nem tüzelsz <svg class="h2icon" viewBox="0 0 210 160" aria-hidden="true"><use href="#steak"/></svg></h2>
-    <p>Ezek olyan helyek, ahol füstölt húst, BBQ-t és grillételeket szolgálnak fel. Szűrhetsz BBQ és steak kategóriára, és értékelheted a kedvenceidet csillagokkal. A pontszámokat az adatbázis tárolja, az átlagba mindenki értékelése beleszámít.</p>
-    <div class="summary" id="sum-ettermek"></div>
-    <div class="tabs" id="filter-ettermek" role="tablist" aria-label="Étterem kategóriák"></div>
-    <div class="cards" id="list-ettermek"></div>
-  </div>
-</section>
-
-<section id="trucklista" class="alt">
-  <div class="wrap">
-    <h2>Food truckok Magyarországon</h2>
-    <p>A Magyar Street Food Egyesület kb. 140–150 aktív food truckot tart nyilván, ezek közül csak néhány ismert, díjnyertes vagy BBQ-hoz kapcsolódó kocsit gyűjtöttem ide. Az alap lista valódi, Magyarországon működő vagy működött, forrásokkal alátámasztott food truckokat tartalmaz; saját kocsit a Regisztráció résznél vehetsz fel.</p>
-    <div class="summary" id="sum-trucks"></div>
-    <div class="tabs" id="filter-trucks" role="tablist" aria-label="Food truck kategóriák"></div>
-    <div class="cards" id="list-trucks"></div>
-  </div>
-</section>
-
-<section id="regisztracio" class="alt">
-  <div class="wrap">
-    <h2>Regisztráció éttermeknek és food trucknak</h2>
-    <p>Ha étterem vagy food truck vagy, itt felveheted magad a listába. Az étterem helyszínét térkép-hivatkozás mutatja, a food truck pedig megadhatja, hol áll éppen, és a következő megállóit is. A helyszínt később a PIN-kóddal frissítheted a kártyán.</p>
-    <form class="regform" id="regform" onsubmit="return false">
-      <label>Típus<select id="r-type"><option value="ettermek">Étterem</option><option value="trucks">Food truck</option></select></label>
-      <label>Név<input id="r-name" maxlength="60"></label>
-      <label>Kategória<select id="r-kat"><option value="bbq">BBQ</option><option value="steak">Steak</option><option value="egyeb">Egyéb</option></select></label>
-      <label id="r-wherel">Cím (város, utca)<input id="r-where" maxlength="90"></label>
-      <label id="r-nowl" hidden>Mai helyszín<input id="r-now" maxlength="90" placeholder="pl. Szeged, Dugonics tér"></label>
-      <label id="r-pinl" hidden>PIN (4 számjegy)<input id="r-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}"></label>
-      <label class="full">Rövid leírás<textarea id="r-desc" maxlength="240"></textarea></label>
-      <button class="btn" type="button" id="r-add">Regisztráció</button>
-    </form>
-    <p class="note">A regisztrációk a szerver adatbázisában tárolódnak. A PIN-kód hash-elve kerül mentésre, de éles használathoz HTTPS-re és valódi felhasználókezelésre is szükség lenne.</p>
-  </div>
-</section>
-
-<section id="tuzrako">
-  <div class="wrap">
-    <h2>Hol rakhatsz tüzet és süthetsz szalonnát?</h2>
-    <p>Erdőben csak kijelölt, kiépített tűzrakóhelyen szabad tüzet rakni, ehhez külön engedély nem kell. A lenti helyek jórészt ilyen, nyilvánosan használható pontok a Budapest környéki grilltérképről, plusz néhány kerthelyiség jellegű lehetőség.</p>
-    <div class="safety"><b>Mielőtt elindulsz:</b> száraz, kánikulai időszakban az egész országra elrendelhető tűzgyújtási tilalom, ilyenkor a kijelölt tűzrakóhelyek sem használhatók (2024 júliusában volt erre példa). Mindig nézd meg az aktuális helyzetet a Nébih és a katasztrófavédelem oldalán, és a helyek elérhetőségét is ellenőrizd.</div>
-    <div class="summary" id="sum-tuz"></div>
-    <div class="tabs" id="filter-tuz"></div>
-    <div class="cards" id="list-tuz"></div>
-
-    <h3 class="sub" style="margin-top:44px">Új hely javaslata</h3>
-    <p>Ismersz olyan tűzrakóhelyet, ami hiányzik? Add hozzá, megjelenik a listában (az adatbázisban tárolódik, és te később törölheted).</p>
-    <form class="addform" id="addform" onsubmit="return false">
-      <select id="f-cat" aria-label="Kategória"><option value="ettermek">BBQ étterem</option><option value="tuz">Tűzrakóhely</option></select>
-      <input id="f-name" placeholder="Név" aria-label="Név" maxlength="60">
-      <input id="f-where" placeholder="Hely (város, cím)" aria-label="Hely" maxlength="80">
-      <textarea id="f-desc" placeholder="Rövid leírás" aria-label="Leírás" maxlength="240"></textarea>
-      <button class="btn" type="button" id="f-add">Hely hozzáadása</button>
-    </form>
-    <p class="note">Források: welovebudapest.com, Trade magazin, Nébih és katasztrófavédelmi tájékoztatók. A helyek nyitvatartása és elérhetősége változhat.</p>
-  </div>
-</section>
-
-<section id="eszkozok" class="alt">
-  <div class="wrap">
-    <h2>Sütögető eszközök</h2>
-    <div class="two">
-      <div class="tool">
-        <h3>Mennyi húst vegyek?</h3>
-        <p>Add meg a létszámot és a húst, a számolás tájékoztató jellegű.</p>
-        <div class="grid">
-          <label>Hány fő?<input type="number" id="k-fo" min="1" max="200" value="6"></label>
-          <label>Hús<select id="k-hus">
-            <option value="250|Steak, szelet (csont nélkül)|Steak: oldalanként kb. 2–4 perc, utána pihentetés">Steak, szelet</option>
-            <option value="400|Csirkecomb (csontos)|Közvetett hőn kb. 30–40 perc, belül 74 °C">Csirkecomb</option>
-            <option value="450|Sertésoldalas (csontos)|110–120 °C-on kb. 4–6 óra">Oldalas</option>
-            <option value="350|Sertéslapocka pulled porkhoz (nyers)|110–120 °C-on kb. 8–10 óra, belül 93–96 °C">Pulled pork</option>
-          </select></label>
-          <label>Étvágy<select id="k-etv"><option value="0.8">Kicsi</option><option value="1" selected>Átlagos</option><option value="1.3">Nagy</option></select></label>
-        </div>
-        <div class="result" id="k-out"></div>
-      </div>
-      <div class="tool">
-        <h3>BBQ-kvíz</h3>
-        <div id="quiz"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="tippek">
-  <div class="wrap">
-    <h2>Biztonságos és jó sütögetés</h2>
-    <p>A szabadtéri sütögetés élvezet, de tűzzel és nyers hússal dolgozunk, ezért néhány alapszabályt érdemes betartani.</p>
-    <div class="tips">
-      <div class="tip"><h3>Tűzbiztonság</h3><p>Stabil, vízszintes helyre állítsd a grillt, távol fáktól, épületektől és száraz fűtől. Legyen kéznél víz vagy oltókészülék.</p></div>
-      <div class="tip"><h3>Gyújtás</h3><p>Folyékony gyújtóst ne önts izzó parázsra. Használj kéményes gyújtót vagy gyújtókockát.</p></div>
-      <div class="tip"><h3>Higiénia</h3><p>Nyers és sült húshoz külön eszközt és tányért használj. Kezet moss a hús érintése után.</p></div>
-      <div class="tip"><h3>Hűtés</h3><p>A húst a sütésig tartsd hűtve, és ne hagyd 2 óránál tovább szobahőmérsékleten, nyáron legfeljebb 1 óráig.</p></div>
-      <div class="tip"><h3>Pihentetés</h3><p>Sütés után hagyd a húst 5–10 percig pihenni, így a leve nem folyik ki szeléskor.</p></div>
-      <div class="tip"><h3>Hamu és parázs</h3><p>A parazsat hagyd teljesen kihűlni, vagy oltsd el vízzel. A forró hamut ne dobd a szemétbe.</p></div>
-    </div>
-    <div class="safety"><b>Fontos:</b> a nyílt tűzgyújtásra helyi szabályok is vonatkozhatnak (például tűzgyújtási tilalom száraz időszakban). Sütögetés előtt mindig érdemes ellenőrizni az aktuális előírásokat.</div>
-  </div>
-</section>
-
-<section id="recept" class="alt">
-  <div class="wrap">
-    <div class="recipe">
-      <h2>Receptajánló: füstölt pulled pork</h2>
-      <p>Kezdőbarát BBQ-klasszikus. Időigény: kb. 8–10 óra, adag: 8–10 fő.</p>
-      <div class="two">
-        <div>
-          <h3>Hozzávalók</h3>
-          <ul>
-            <li>2,5–3 kg sertéslapocka (csont nélkül)</li>
-            <li>3 ek barna cukor</li>
-            <li>2 ek füstölt paprika</li>
-            <li>1 ek só, 1 ek fekete bors</li>
-            <li>1 tk fokhagymapor, 1 tk hagymapor</li>
-            <li>1 dl almalé vagy almaecet a permetezéshez</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Elkészítés</h3>
-          <ol>
-            <li>Keverd össze a fűszereket, és dörzsöld be vele a húst. Pihentesd hűtőben 2–12 órát.</li>
-            <li>Állítsd be a smokert vagy a zárt grillt 110–120 °C-ra, és tegyél rá gyümölcsfát.</li>
-            <li>Süsd a húst 5–6 órán át, óránként permetezd meg almaléval.</li>
-            <li>Ha a belseje eléri a 70 °C-ot, csomagold alufóliába, és süsd tovább 93–96 °C-ig.</li>
-            <li>Pihentesd 30–60 percig, majd villával szedd szálaira. Tálald zsemlével, coleslaw-val.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<section id="gyik">
-  <div class="wrap">
-    <h2>Gyakori kérdések</h2>
-    <details class="faq"><summary>Faszén vagy gáz a jobb?</summary><p>A faszén intenzívebb, füstösebb ízt ad, de lassabban gyullad és több odafigyelést kér. A gázgrill gyorsabb és pontosabban szabályozható. A választás ízlés és alkalom kérdése.</p></details>
-    <details class="faq"><summary>Miért kell pihentetni a húst sütés után?</summary><p>Sütés közben a hús leve a közepe felé szorul. Pár perc pihenés alatt újra eloszlik, így szeleteléskor kevesebb folyik ki, és szaftosabb marad.</p></details>
-    <details class="faq"><summary>Mi az a low and slow?</summary><p>Alacsony hőmérsékleten, hosszú idő alatt sütés, jellemzően kb. 110–135 °C-on. Ettől a kötőszövet omlóssá válik, ezért ezt használják brisketnél és pulled porknál.</p></details>
-    <details class="faq"><summary>Hogyan tisztítsam a grillrácsot?</summary><p>A legkönnyebb még forrón, drótkefével lekaparni, majd olajozott ruhával áttörölni. Így nem ragad rá a következő hús.</p></details>
-    <details class="faq"><summary>Mikor tilos tüzet gyújtani?</summary><p>Száraz, aszályos időszakban az egész országra vagy egyes területekre tűzgyújtási tilalmat rendelhetnek el, ilyenkor a kijelölt tűzrakóhelyek sem használhatók. Indulás előtt érdemes megnézni az aktuális tájékoztatást.</p></details>
   </div>
 </section>
 </main>
 
-<div class="grillbar"></div>
 <footer>
   <div class="wrap">
-    <h3>Összegzés</h3>
-    <p>A BBQ, a food truck kultúra és a szabadtéri sütögetés közös gyökere a tűz és a közösség. Aki elsajátítja az alapokat (hőkezelés, higiénia, biztonság), az a kerti sütögetéstől a saját mobil konyháig bármeddig eljuthat.</p>
-    <p>Vizsgaremek • Készítette: <b>[Név]</b> • Osztály: <b>[Osztály]</b> • Iskola: <b>[Iskola neve]</b> • <span id="ev"></span></p>
-    <p>Felhasznált források: szakirodalom és hatósági élelmiszer-biztonsági ajánlások, saját tapasztalat.</p>
+    <p>Füst &amp; Parázs • <span id="ev"></span></p>
   </div>
 </footer>
 
-<button id="totop" type="button" aria-label="Vissza a tetejére">↑</button>
 <script src="js/app.js"></script>
+<script>
+  document.getElementById('ev').textContent = new Date().getFullYear();
+  
+  // Hamburger menü
+  const btn = document.getElementById('navbtn');
+  const nav = document.querySelector('.main-nav');
+  btn.addEventListener('click', function () {
+    nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
+  });
+
+  // Auth sáv frissítése
+  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
+  const authNav = document.getElementById('auth-nav');
+  if (user) {
+    authNav.innerHTML = `
+      <span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span>
+      <a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>
+    `;
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('fp_user');
+      window.location.reload();
+    });
+  }
+</script>
 </body>
 </html>

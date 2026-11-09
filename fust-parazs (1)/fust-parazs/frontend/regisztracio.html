@@ -5,431 +5,363 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Regisztráció – Füst &amp; Parázs</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
-:root{
-  --teal:#1f5f5b; --teal-d:#143f3c; --mustard:#f0b429; --brick:#a63a26;
-  --chalk:#faf6ee; --ink:#231f1c; --paper:#fff;
-  --display:'Outfit','Georgia',serif;
-  --body:'Inter','Segoe UI',Arial,sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;scroll-padding-top:70px}
-body{font-family:var(--body);background:var(--chalk);color:var(--ink);line-height:1.65;font-size:17px}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--mustard);outline-offset:3px}
-.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
-h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.1}
-h2{font-size:clamp(1.7rem,4vw,2.4rem);color:var(--teal);margin-bottom:.5em}
-h3{font-size:1.1rem;margin-bottom:.4em}
-p{max-width:68ch;margin-bottom:1em}
-
-/* nav */
-nav{position:sticky;top:0;z-index:20;background:var(--ink);border-bottom:4px solid var(--mustard)}
-nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px;max-width:1240px}
-.logo{font-family:var(--display);font-weight:800;color:var(--mustard);text-decoration:none;font-size:1.25rem}
-nav ul{display:flex;gap:4px;list-style:none;flex-wrap:wrap}
-nav li a{display:block;color:var(--chalk);text-decoration:none;padding:6px 10px;border-radius:6px;font-weight:600;font-size:.88rem;white-space:nowrap}
-nav li a:hover,nav li a[aria-current]{background:var(--brick);color:#fff}
-
-/* hero */
-.page-hero{background:var(--teal);color:var(--chalk);padding:52px 0 48px;border-bottom:5px solid var(--ink)}
-.page-hero h1{font-size:clamp(2.2rem,6vw,3.8rem);color:var(--mustard);text-shadow:3px 3px 0 var(--teal-d);margin-bottom:.3em}
-.page-hero p{font-size:1.1rem;max-width:46ch;color:#d4ece9}
-
-/* type selector */
-.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:28px 0;border:3px solid var(--ink);border-radius:14px;overflow:hidden}
-.type-btn{font:inherit;font-weight:700;cursor:pointer;padding:16px;background:var(--chalk);color:var(--ink);border:none;font-size:1rem;font-family:var(--display);transition:background .15s}
-.type-btn:first-child{border-right:3px solid var(--ink)}
-.type-btn.active{background:var(--brick);color:#fff}
-.type-btn:not(.active):hover{background:var(--mustard)}
-
-/* form card */
-.form-card{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:32px;box-shadow:7px 7px 0 var(--teal);margin-bottom:28px}
-.form-card.truck-only,.form-card.rest-only{display:none}
-.form-card.show{display:block}
-.form-card h3{color:var(--brick);margin-bottom:14px}
-
-.regform{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.regform label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.88rem}
-.regform input,.regform select,.regform textarea{font:inherit;font-weight:400;padding:11px 14px;border:3px solid var(--ink);border-radius:8px;background:var(--chalk);width:100%;font-size:.97rem}
-.regform input:focus,.regform select:focus,.regform textarea:focus{outline:3px solid var(--mustard);outline-offset:1px;border-color:var(--teal)}
-.regform textarea{min-height:80px;resize:vertical}
-.regform .full{grid-column:1/-1}
-.regform .hint{font-weight:400;font-size:.82rem;color:#6a6058;margin-top:3px}
-.regform .sub-label{font-weight:400;color:#6a6058;font-size:.82rem}
-
-.btn-primary{display:inline-block;background:var(--mustard);color:var(--ink);font-weight:800;font:inherit;cursor:pointer;padding:13px 28px;border-radius:999px;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);font-size:1rem;font-family:var(--display);transition:transform .15s,box-shadow .15s;margin-top:4px}
-.btn-primary:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink)}
-
-/* stops section */
-.stops-section{margin-top:14px;padding-top:14px;border-top:2px dashed #d9d2c3}
-.stop-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-bottom:8px}
-.stop-row input{font:inherit;padding:9px 12px;border:2.5px solid var(--ink);border-radius:7px;background:var(--chalk);font-size:.93rem;width:100%}
-.stop-remove{font:inherit;cursor:pointer;padding:6px 12px;border:2px solid var(--brick);border-radius:999px;background:transparent;color:var(--brick);font-weight:700;font-size:.82rem}
-.stop-remove:hover{background:var(--brick);color:#fff}
-.add-stop{font:inherit;cursor:pointer;padding:7px 16px;border:2.5px dashed var(--teal);border-radius:999px;background:transparent;color:var(--teal);font-weight:700;font-size:.88rem;margin-top:6px}
-.add-stop:hover{background:var(--teal);color:#fff}
-
-/* note */
-.note-box{border-left:6px solid var(--brick);background:#fff4f2;padding:14px 18px;border-radius:0 10px 10px 0;border-top:2px solid #e5c8c0;border-right:2px solid #e5c8c0;border-bottom:2px solid #e5c8c0;margin-top:0;font-size:.88rem}
-.note-box b{color:var(--brick)}
-
-/* steps */
-.how-section{padding:52px 0;background:var(--paper);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:24px}
-.step{padding:22px;border:3px solid var(--ink);border-radius:14px;background:var(--chalk);position:relative}
-.step-num{font-family:var(--display);font-weight:800;font-size:2.5rem;color:var(--mustard);line-height:1;-webkit-text-stroke:2px var(--ink);display:block;margin-bottom:6px}
-.step h3{font-size:1rem}
-.step p{font-size:.88rem;margin:6px 0 0;max-width:100%}
-
-/* success banner */
-.success{display:none;background:var(--teal);color:#fff;border:3px solid var(--ink);border-radius:14px;padding:22px 26px;margin-top:20px;box-shadow:5px 5px 0 var(--ink)}
-.success h3{color:var(--mustard);margin-bottom:.3em}
-.success p{margin:0;font-size:.93rem;color:#d4ece9}
-.success.show{display:block}
-
-/* error */
-.field-error{color:var(--brick);font-size:.82rem;font-weight:700;margin-top:3px;display:none}
-.field-error.show{display:block}
-input.invalid,select.invalid,textarea.invalid{border-color:var(--brick)!important}
-
-/* form section */
-.form-section{padding:52px 0}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-.sidebar-info{background:var(--ink);color:var(--chalk);border:4px solid var(--mustard);border-radius:16px;padding:28px}
-.sidebar-info h3{color:var(--mustard);margin-bottom:.5em;font-size:1.1rem}
-.sidebar-info p{color:#c9c2b4;font-size:.9rem;margin-bottom:.7em;max-width:100%}
-.sidebar-info p:last-child{margin:0}
-.sidebar-info a{color:var(--mustard)}
-
-footer{background:var(--ink);color:#d9d2c3;padding:36px 0;font-size:.93rem;border-top:4px solid var(--mustard)}
-footer .logo{display:inline-block;margin-bottom:8px}
-footer p{margin-bottom:.4em}
-footer a{color:var(--mustard);font-weight:600}
-
-@media(max-width:760px){
-  .two-col{grid-template-columns:1fr}
-  .type-toggle{grid-template-columns:1fr}
-  .type-btn:first-child{border-right:none;border-bottom:3px solid var(--ink)}
-}
+  nav.main-nav { position: sticky; top: 0; z-index: 100; background: rgba(23,26,29,.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.1); }
+  .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; max-width: 1240px; margin: 0 auto; flex-wrap: wrap; }
+  .nav-links { display: flex; gap: 12px; list-style: none; align-items: center; margin: 0; padding: 0; }
+  .nav-links li a { color: var(--chalk); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 8px 12px; border-radius: 6px; transition: background 0.2s; }
+  .nav-links li a:hover { background: rgba(255,255,255,.12); }
+  .auth-buttons { display: flex; gap: 10px; align-items: center; }
+  .btn-login { color: var(--chalk); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3); transition: background 0.2s; }
+  .btn-login:hover { background: rgba(255,255,255,.1); }
+  .btn-register { background: var(--mustard); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.95rem; padding: 8px 16px; border-radius: 999px; transition: transform 0.2s; }
+  .btn-register:hover { transform: translateY(-2px); }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 5px; }
+  .hamburger span { display: block; width: 25px; height: 3px; background-color: var(--chalk); border-radius: 3px; transition: 0.3s; }
+  @media (max-width: 1100px) {
+    .nav-links { display: none; width: 100%; flex-direction: column; order: 4; background: var(--ink); padding: 15px 0; border-radius: 0 0 10px 10px; }
+    .main-nav.open .nav-links { display: flex; }
+    .auth-buttons { order: 2; margin-left: auto; margin-right: 15px; }
+    .hamburger { display: flex; order: 3; }
+  }
 </style>
 </head>
 <body>
 
-<nav aria-label="Főmenü">
-  <div class="wrap">
+<nav class="main-nav" aria-label="Főmenü">
+  <div class="nav-container">
     <a class="logo" href="index.html">Füst &amp; Parázs</a>
-    <ul>
+    <ul id="navlist" class="nav-links">
       <li><a href="index.html">Főoldal</a></li>
+      <li><a href="index.html#modszerek">Módszerek</a></li>
+      <li><a href="index.html#homerseklet">Hőfokok</a></li>
       <li><a href="recept.html">Receptek</a></li>
-      <li><a href="regisztracio.html" aria-current="page">Regisztráció</a></li>
+      <li><a href="helyek.html">Helyek térképen</a></li>
     </ul>
+    <div class="auth-buttons" id="auth-nav">
+      <a href="belepes.html" class="btn-login">Belépés</a>
+      <a href="regisztracio.html" class="btn-register">Regisztráció</a>
+    </div>
+    <button id="navbtn" class="hamburger" aria-expanded="false" aria-controls="navlist">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
-<header class="page-hero">
+<header class="hero" style="padding: 40px 0; border-bottom: 4px solid var(--mustard);">
   <div class="wrap">
-    <h1>Regisztráció</h1>
-    <p>Étterem vagy food truck? Vedd fel magad a listába, és a látogatók megtalálnak téged is.</p>
+    <h1 style="font-size: clamp(2rem, 6vw, 3.5rem); text-shadow: none; background: none; -webkit-background-clip: unset; color: var(--mustard);">Csatlakozz a közösséghez</h1>
+    <p class="lead" style="max-width: 600px;">Hozd létre a fiókodat, és töltsd fel a saját éttermed, food truckod vagy kedvenc tűzrakóhelyed.</p>
   </div>
 </header>
 
-<section class="how-section">
+<main style="padding: 40px 0; min-height: 80vh; background: var(--chalk);">
+<section id="regisztracio">
   <div class="wrap">
-    <h2>Hogyan működik?</h2>
-    <div class="steps">
-      <div class="step">
-        <span class="step-num">01</span>
-        <h3>Válassz típust</h3>
-        <p>Étterem vagy food truck — a form igazodik a típushoz.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">02</span>
-        <h3>Add meg az adataidat</h3>
-        <p>Név, kategória, helyszín, rövid leírás. Food truck esetén a mai helyszín és az elkövetkező megállók is.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">03</span>
-        <h3>Regisztrálj PIN-kóddal</h3>
-        <p>A 4 jegyű PIN-kóddal tudod majd frissíteni a helyszíned, vagy törölni a kártyád.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">04</span>
-        <h3>Megjelensz a listán</h3>
-        <p>A regisztráció után azonnal felkerülsz az étterem vagy food truck listára a főoldalon.</p>
+    
+    <!-- Ha nincs bejelentkezve: Fiók létrehozása -->
+    <div class="panel" id="section-account" style="max-width: 600px; margin: 0 auto; display: none;">
+      <h3 style="color: var(--teal);">Fiók létrehozása</h3>
+      <p style="font-size: 0.95rem; margin-bottom: 20px;">Add meg az adataidat a regisztrációhoz. A csillaggal jelölt mezők kötelezőek.</p>
+      
+      <form class="regform" id="form-account" onsubmit="return false">
+        <label class="full">Teljes név *<input type="text" id="acc-name" placeholder="Kovács István" required></label>
+        <label class="full">E-mail cím *<input type="email" id="acc-email" placeholder="istvan@example.com" required></label>
+        <label class="full">Jelszó *<input type="password" id="acc-pass" placeholder="••••••••" required></label>
+        
+        <label class="full">Milyen felhasználó vagy? *
+          <select id="acc-role">
+            <option value="user">Sima felhasználó (csak értékelni szeretnék)</option>
+            <option value="etterem">Étterem tulajdonos</option>
+            <option value="truck">Food truck tulajdonos</option>
+            <option value="mindketto">Étterem és Food truck tulajdonos is</option>
+          </select>
+        </label>
+
+        <div class="full" style="margin-top: 10px;">
+          <label style="display: flex; flex-direction: row; align-items: center; gap: 8px; font-weight: 400; cursor: pointer;">
+            <input type="checkbox" id="acc-aszf" required style="width: auto;">
+            Elfogadom az adatkezelési tájékoztatót és a felhasználási feltételeket.
+          </label>
+        </div>
+        <button class="btn full" type="button" id="btn-acc-reg" style="margin-top: 15px;">Fiók létrehozása</button>
+      </form>
+      <p id="reg-msg" class="apimsg" style="display:none; margin-top: 14px; color: var(--brick); font-weight: bold;"></p>
+      <p class="note" style="margin-top: 20px; font-size: 0.88rem;">Már van fiókod? <a href="belepes.html" style="color: var(--teal); font-weight: bold;">Jelentkezz be itt</a>.</p>
+    </div>
+
+    <!-- Ha be van jelentkezve: Hely feltöltése -->
+    <div id="section-place" style="display: none;">
+      <div class="panel" style="max-width: 800px; margin: 0 auto;">
+        <h3 style="color: var(--teal);">Hely feltöltése</h3>
+        <p style="font-size: 0.95rem; margin-bottom: 15px;">Válaszd ki, milyen típusú helyet szeretnél hozzáadni a térképhez.</p>
+        
+        <div class="tabs" id="place-tabs" role="tablist" aria-label="Hely típusa">
+          <button type="button" role="tab" data-target="form-ettermek" aria-selected="true">Étterem</button>
+          <button type="button" role="tab" data-target="form-truck" aria-selected="false">Food Truck</button>
+          <button type="button" role="tab" data-target="form-tuz" aria-selected="false">Tűzrakóhely</button>
+        </div>
+
+        <!-- Étterem -->
+        <form class="regform place-form" id="form-ettermek" onsubmit="return false">
+          <label class="full">Étterem neve *<input type="text" id="e-name" maxlength="60" required placeholder="Pl. Smoky BBQ"></label>
+          <label class="full">Cím (város, utca) *<input type="text" id="e-where" maxlength="90" required placeholder="Pl. Budapest, Váci utca 1."></label>
+          <label class="full">Megye *
+            <select id="e-county">
+              <option value="Budapest">Budapest</option>
+              <option value="Pest">Pest</option>
+              <option value="Bács-Kiskun">Bács-Kiskun</option>
+              <option value="Baranya">Baranya</option>
+              <option value="Békés">Békés</option>
+              <option value="Borsod-Abaúj-Zemplén">Borsod-Abaúj-Zemplén</option>
+              <option value="Csongrád-Csanád">Csongrád-Csanád</option>
+              <option value="Fejér">Fejér</option>
+              <option value="Győr-Moson-Sopron">Győr-Moson-Sopron</option>
+              <option value="Hajdú-Bihar">Hajdú-Bihar</option>
+              <option value="Heves">Heves</option>
+              <option value="Jász-Nagykun-Szolnok">Jász-Nagykun-Szolnok</option>
+              <option value="Komárom-Esztergom">Komárom-Esztergom</option>
+              <option value="Nógrád">Nógrád</option>
+              <option value="Somogy">Somogy</option>
+              <option value="Szabolcs-Szatmár-Bereg">Szabolcs-Szatmár-Bereg</option>
+              <option value="Tolna">Tolna</option>
+              <option value="Vas">Vas</option>
+              <option value="Veszprém">Veszprém</option>
+              <option value="Zala">Zala</option>
+            </select>
+          </label>
+          <label class="full">Rövid leírás<textarea id="e-desc" maxlength="240" placeholder="Miért érdemes ide betérni?"></textarea></label>
+          <button class="btn full" type="button" id="btn-add-ettermek" style="margin-top: 15px;">Étterem mentése</button>
+        </form>
+
+        <!-- Food Truck -->
+        <form class="regform place-form" id="form-truck" onsubmit="return false" hidden>
+          <label class="full">Truck neve *<input type="text" id="t-name" maxlength="60" required placeholder="Pl. Smoke on Wheels"></label>
+          <label class="full">Bázis (város) *<input type="text" id="t-where" maxlength="90" required placeholder="Pl. Szeged"></label>
+          <label class="full">Megye *
+            <select id="t-county">
+              <option value="Budapest">Budapest</option>
+              <option value="Pest">Pest</option>
+              <option value="Bács-Kiskun">Bács-Kiskun</option>
+              <option value="Baranya">Baranya</option>
+              <option value="Békés">Békés</option>
+              <option value="Borsod-Abaúj-Zemplén">Borsod-Abaúj-Zemplén</option>
+              <option value="Csongrád-Csanád">Csongrád-Csanád</option>
+              <option value="Fejér">Fejér</option>
+              <option value="Győr-Moson-Sopron">Győr-Moson-Sopron</option>
+              <option value="Hajdú-Bihar">Hajdú-Bihar</option>
+              <option value="Heves">Heves</option>
+              <option value="Jász-Nagykun-Szolnok">Jász-Nagykun-Szolnok</option>
+              <option value="Komárom-Esztergom">Komárom-Esztergom</option>
+              <option value="Nógrád">Nógrád</option>
+              <option value="Somogy">Somogy</option>
+              <option value="Szabolcs-Szatmár-Bereg">Szabolcs-Szatmár-Bereg</option>
+              <option value="Tolna">Tolna</option>
+              <option value="Vas">Vas</option>
+              <option value="Veszprém">Veszprém</option>
+              <option value="Zala">Zala</option>
+            </select>
+          </label>
+          <label class="full">Mai helyszín<input type="text" id="t-now" maxlength="90" placeholder="Pl. Szeged, Dugonics tér"></label>
+          <label class="full">PIN kód (4 számjegy) *<input type="text" id="t-pin" maxlength="4" pattern="[0-9]{4}" required placeholder="1234"></label>
+          <label class="full">Rövid leírás<textarea id="t-desc" maxlength="240" placeholder="Mit lehet nálad kapni?"></textarea></label>
+          <button class="btn full" type="button" id="btn-add-truck" style="margin-top: 15px;">Truck mentése</button>
+        </form>
+
+        <!-- Tűzrakóhely -->
+        <form class="regform place-form" id="form-tuz" onsubmit="return false" hidden>
+          <label class="full">Helyszín neve *<input type="text" id="tz-name" maxlength="60" required placeholder="Pl. Hármashatár-hegyi tűzrakó"></label>
+          <label class="full">Hely (város, cím) *<input type="text" id="tz-where" maxlength="90" required placeholder="Pl. Budapest, Hármashatár-hegy"></label>
+          <label class="full">Megye *
+            <select id="tz-county">
+              <option value="Budapest">Budapest</option>
+              <option value="Pest">Pest</option>
+              <option value="Bács-Kiskun">Bács-Kiskun</option>
+              <option value="Baranya">Baranya</option>
+              <option value="Békés">Békés</option>
+              <option value="Borsod-Abaúj-Zemplén">Borsod-Abaúj-Zemplén</option>
+              <option value="Csongrád-Csanád">Csongrád-Csanád</option>
+              <option value="Fejér">Fejér</option>
+              <option value="Győr-Moson-Sopron">Győr-Moson-Sopron</option>
+              <option value="Hajdú-Bihar">Hajdú-Bihar</option>
+              <option value="Heves">Heves</option>
+              <option value="Jász-Nagykun-Szolnok">Jász-Nagykun-Szolnok</option>
+              <option value="Komárom-Esztergom">Komárom-Esztergom</option>
+              <option value="Nógrád">Nógrád</option>
+              <option value="Somogy">Somogy</option>
+              <option value="Szabolcs-Szatmár-Bereg">Szabolcs-Szatmár-Bereg</option>
+              <option value="Tolna">Tolna</option>
+              <option value="Vas">Vas</option>
+              <option value="Veszprém">Veszprém</option>
+              <option value="Zala">Zala</option>
+            </select>
+          </label>
+          <label class="full">Leírás (pl. kiépített, tűzgyűjtő)<textarea id="tz-desc" maxlength="240" placeholder="Milyen a hely? Van-e tűzgyűjtő, pad, víz?"></textarea></label>
+          <button class="btn full" type="button" id="btn-add-tuz" style="margin-top: 15px;">Tűzrakóhely mentése</button>
+        </form>
+
       </div>
     </div>
-  </div>
-</section>
 
-<section class="form-section">
-  <div class="wrap">
-    <div class="two-col">
-
-      <div>
-        <h2>Regisztrálj most</h2>
-        <p>Minden mező kötelező, kivéve a food truck következő megállóit.</p>
-
-        <div class="type-toggle" role="group" aria-label="Regisztráció típusa">
-          <button class="type-btn active" id="btn-ettermek" onclick="setType('ettermek')">🍖 Étterem</button>
-          <button class="type-btn" id="btn-trucks" onclick="setType('trucks')">🚚 Food truck</button>
-        </div>
-
-        <!-- ÉTTEREM form -->
-        <div class="form-card show" id="form-ettermek">
-          <h3>Étterem adatai</h3>
-          <div class="regform" id="rform-ettermek">
-            <label>
-              Étterem neve
-              <input id="e-name" maxlength="60" autocomplete="organization" placeholder="pl. Parázs Bisztró">
-              <span class="field-error" id="e-name-err">Add meg az étterem nevét.</span>
-            </label>
-            <label>
-              Kategória
-              <select id="e-kat">
-                <option value="bbq">BBQ</option>
-                <option value="steak">Steak</option>
-                <option value="egyeb">Egyéb</option>
-              </select>
-            </label>
-            <label class="full">
-              Cím (város, utca)
-              <input id="e-where" maxlength="90" autocomplete="street-address" placeholder="pl. Budapest, Király utca 12.">
-              <span class="field-error" id="e-where-err">Add meg a pontos címet.</span>
-            </label>
-            <label class="full">
-              Rövid leírás
-              <textarea id="e-desc" maxlength="240" placeholder="Egy-két mondat az étteremről, specialitásokról…"></textarea>
-              <span class="hint">Maximum 240 karakter.</span>
-              <span class="field-error" id="e-desc-err">Írj egy rövid leírást.</span>
-            </label>
-            <label>
-              PIN-kód (4 számjegy)
-              <input id="e-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="1234" autocomplete="off">
-              <span class="hint">Ezzel tudod majd frissíteni vagy törölni az adataidat.</span>
-              <span class="field-error" id="e-pin-err">4 jegyű számot adj meg.</span>
-            </label>
-          </div>
-          <div style="margin-top:18px">
-            <button class="btn-primary" onclick="submitForm('ettermek')">Regisztráció →</button>
-          </div>
-          <div class="success" id="e-success">
-            <h3>Sikeresen regisztráltál!</h3>
-            <p>Az éttermed hamarosan megjelenik a főoldali listán. A PIN-kóddal bármikor szerkesztheted az adataidat.</p>
-          </div>
-        </div>
-
-        <!-- FOOD TRUCK form -->
-        <div class="form-card truck-only" id="form-trucks">
-          <h3>Food truck adatai</h3>
-          <div class="regform" id="rform-trucks">
-            <label>
-              Food truck neve
-              <input id="t-name" maxlength="60" autocomplete="organization" placeholder="pl. Smoky Sam BBQ Truck">
-              <span class="field-error" id="t-name-err">Add meg a food truck nevét.</span>
-            </label>
-            <label>
-              Kategória
-              <select id="t-kat">
-                <option value="bbq">BBQ</option>
-                <option value="steak">Steak</option>
-                <option value="egyeb">Egyéb</option>
-              </select>
-            </label>
-            <label class="full">
-              Mai helyszín
-              <input id="t-now" maxlength="90" placeholder="pl. Szeged, Dugonics tér">
-              <span class="hint">Hol állsz most? Ezt később frissítheted a PIN-kóddal.</span>
-              <span class="field-error" id="t-now-err">Add meg a mai helyszínt.</span>
-            </label>
-            <label class="full">
-              Rövid leírás
-              <textarea id="t-desc" maxlength="240" placeholder="Pl. faszenes BBQ és pulled pork…"></textarea>
-              <span class="hint">Maximum 240 karakter.</span>
-              <span class="field-error" id="t-desc-err">Írj egy rövid leírást.</span>
-            </label>
-            <label>
-              PIN-kód (4 számjegy)
-              <input id="t-pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="1234" autocomplete="off">
-              <span class="hint">Helyszín frissítéséhez és törléshez szükséges.</span>
-              <span class="field-error" id="t-pin-err">4 jegyű számot adj meg.</span>
-            </label>
-          </div>
-
-          <!-- Következő megállók -->
-          <div class="stops-section">
-            <h3 style="margin-bottom:10px">Következő megállók <span class="sub-label">(elhagyható)</span></h3>
-            <p style="font-size:.88rem;max-width:100%;margin-bottom:10px">Add meg, hova mész a következő napokban — a látogatók ezt is látják majd a kártyádon.</p>
-            <div id="stops-list"></div>
-            <button class="add-stop" type="button" onclick="addStop()">+ Megálló hozzáadása</button>
-          </div>
-
-          <div style="margin-top:20px">
-            <button class="btn-primary" onclick="submitForm('trucks')">Regisztráció →</button>
-          </div>
-          <div class="success" id="t-success">
-            <h3>Sikeresen regisztráltál!</h3>
-            <p>A food trucked megjelenik a főoldali listán. A PIN-kóddal bármikor frissítheted a helyszínt.</p>
-          </div>
-        </div>
-
-        <div class="note-box" style="margin-top:16px">
-          <b>Megjegyzés:</b> A regisztrációk a szerver adatbázisában tárolódnak. A PIN-kód hash-elve kerül mentésre, de éles használathoz HTTPS-re és valódi felhasználókezelésre van szükség.
-        </div>
-      </div>
-
-      <div>
-        <div class="sidebar-info">
-          <h3>Miért érdemes regisztrálni?</h3>
-          <p>A főoldalon az összes étterem és food truck egy helyen jelenik meg, szűrhető és kereshető formában. A látogatók értékelhetnek, és a kártyán látják az összes fontos infót.</p>
-          <p>Food truck esetén a mai helyszínt és a következő megállókat is megjeleníti az oldal — így a rajongók mindig tudják, hol találnak téged.</p>
-          <p>A PIN-kóddal bármikor frissítheted az adataidat, vagy törölheted a regisztrációd a kártyádon lévő gombbal.</p>
-          <p><a href="index.html#ettermek">← Megnézem az étteremlistát</a></p>
-        </div>
-
-        <div style="margin-top:24px;border:3px solid var(--ink);border-radius:14px;padding:22px;background:var(--chalk);box-shadow:5px 5px 0 var(--mustard)">
-          <h3>Kategóriák</h3>
-          <p style="font-size:.88rem;margin-top:8px;max-width:100%">
-            <b>BBQ</b> — lassú, füstölt sütés, brisket, pulled pork, oldalas.<br>
-            <b>Steak</b> — elsősorban marhaszelet, grillezés, szteakhouse jellegű hely.<br>
-            <b>Egyéb</b> — burger, sertés, szárnyasok, vegán BBQ, vagy ha egyik sem illik.
-          </p>
-        </div>
-      </div>
-
+    <!-- Ha nincs bejelentkezve, de ide kattintott -->
+    <div id="section-login-prompt" class="panel" style="max-width: 500px; margin: 0 auto; display: none; text-align: center;">
+      <h3 style="color: var(--teal);">Hely feltöltéséhez be kell jelentkezned</h3>
+      <p style="margin: 15px 0;">Ahhoz, hogy éttermet, food truckot vagy tűzrakóhelyet tölthess fel, először létre kell hoznod egy fiókot, vagy be kell jelentkezned.</p>
+      <a href="belepes.html" class="btn" style="display: inline-block;">Belépés</a>
+      <p style="margin-top: 15px; font-size: 0.9rem;"><a href="#" id="show-register-link" style="color: var(--teal); font-weight: 700;">Vagy regisztrálj új fiókot</a></p>
     </div>
+
   </div>
 </section>
+</main>
 
 <footer>
   <div class="wrap">
-    <a class="logo" href="index.html">Füst &amp; Parázs</a>
-    <p>BBQ-receptek, food truckok, tűzrakóhelyek.</p>
-    <p><a href="index.html">← Vissza a főoldalra</a> · <a href="recept.html">Receptek</a></p>
+    <p>Füst &amp; Parázs • <span id="ev"></span></p>
   </div>
 </footer>
 
+<script src="js/app.js"></script>
 <script>
-// FILL: az API base URL-t a szerver elérési útjára kell állítani (pl. 'http://localhost:3000/api')
-var API = '/api';
+(function () {
+  document.getElementById('ev').textContent = new Date().getFullYear();
 
-var currentType = 'ettermek';
-var stops = [];
-
-function setType(t) {
-  currentType = t;
-  document.getElementById('btn-ettermek').classList.toggle('active', t === 'ettermek');
-  document.getElementById('btn-trucks').classList.toggle('active', t === 'trucks');
-  document.getElementById('form-ettermek').classList.toggle('show', t === 'ettermek');
-  document.getElementById('form-ettermek').classList.toggle('form-card', true);
-  document.getElementById('form-trucks').classList.toggle('show', t === 'trucks');
-  document.getElementById('form-trucks').classList.toggle('truck-only', t !== 'trucks');
-}
-
-function addStop() {
-  var idx = stops.length;
-  stops.push('');
-  renderStops();
-}
-
-function removeStop(idx) {
-  stops.splice(idx, 1);
-  renderStops();
-}
-
-function renderStops() {
-  var list = document.getElementById('stops-list');
-  list.innerHTML = '';
-  stops.forEach(function(s, i) {
-    var row = document.createElement('div');
-    row.className = 'stop-row';
-    var inp = document.createElement('input');
-    inp.type = 'text'; inp.maxLength = 90; inp.placeholder = 'pl. Pécs, Széchenyi tér – 2026-11-08';
-    inp.value = s;
-    inp.setAttribute('aria-label', 'Megálló ' + (i+1));
-    inp.addEventListener('input', function(){ stops[i] = inp.value; });
-    var rm = document.createElement('button');
-    rm.type = 'button'; rm.className = 'stop-remove'; rm.textContent = 'Törlés';
-    rm.addEventListener('click', function(){ removeStop(i); });
-    row.appendChild(inp); row.appendChild(rm);
-    list.appendChild(row);
+  // Hamburger menü
+  const btn = document.getElementById('navbtn');
+  const nav = document.querySelector('.main-nav');
+  btn.addEventListener('click', function () {
+    nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded', nav.classList.contains('open'));
   });
-}
 
-function validate(fields) {
-  var ok = true;
-  fields.forEach(function(f) {
-    var el = document.getElementById(f.id);
-    var err = document.getElementById(f.id + '-err');
-    var valid = f.check(el.value.trim());
-    el.classList.toggle('invalid', !valid);
-    if(err) err.classList.toggle('show', !valid);
-    if(!valid) ok = false;
-  });
-  return ok;
-}
-
-function submitForm(type) {
-  var fields, body;
-
-  if(type === 'ettermek') {
-    var ok = validate([
-      {id:'e-name', check: function(v){ return v.length > 1; }},
-      {id:'e-where', check: function(v){ return v.length > 2; }},
-      {id:'e-desc', check: function(v){ return v.length > 2; }},
-      {id:'e-pin', check: function(v){ return /^[0-9]{4}$/.test(v); }}
-    ]);
-    if(!ok) return;
-    body = {
-      cat: 'ettermek',
-      name: document.getElementById('e-name').value.trim(),
-      kat: document.getElementById('e-kat').value,
-      where: document.getElementById('e-where').value.trim(),
-      desc: document.getElementById('e-desc').value.trim(),
-      pin: document.getElementById('e-pin').value
-    };
-  } else {
-    var ok = validate([
-      {id:'t-name', check: function(v){ return v.length > 1; }},
-      {id:'t-now', check: function(v){ return v.length > 2; }},
-      {id:'t-desc', check: function(v){ return v.length > 2; }},
-      {id:'t-pin', check: function(v){ return /^[0-9]{4}$/.test(v); }}
-    ]);
-    if(!ok) return;
-    body = {
-      cat: 'trucks',
-      name: document.getElementById('t-name').value.trim(),
-      kat: document.getElementById('t-kat').value,
-      now: document.getElementById('t-now').value.trim(),
-      desc: document.getElementById('t-desc').value.trim(),
-      pin: document.getElementById('t-pin').value,
-      megallok: stops.filter(function(s){ return s.trim(); })
-    };
+  // Auth sáv
+  const user = JSON.parse(localStorage.getItem('fp_user') || 'null');
+  const authNav = document.getElementById('auth-nav');
+  if (user) {
+    authNav.innerHTML = `<span style="color:var(--chalk); font-weight:600; font-size:0.9rem; margin-right:5px;">Szia, ${user.nev.split(' ')[0]}!</span><a href="#" id="logout-btn" class="btn-login" style="background:var(--brick); border:none;">Kilépés</a>`;
+    document.getElementById('logout-btn').addEventListener('click', function(e) { e.preventDefault(); localStorage.removeItem('fp_user'); window.location.reload(); });
   }
 
-  var btn = document.querySelector('#form-' + type + ' .btn-primary');
-  btn.disabled = true; btn.textContent = 'Küldés…';
+  // Állapot ellenőrzése
+  var secAcc = document.getElementById('section-account');
+  var secPlace = document.getElementById('section-place');
+  var secPrompt = document.getElementById('section-login-prompt');
 
-  fetch(API + '/helyek', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  }).then(function(r){
-    return r.json().then(function(j){
-      if(!r.ok) throw new Error(j.error || 'Szerverhiba');
-      return j;
+  if (user) {
+    secPlace.style.display = 'block';
+    secAcc.style.display = 'none';
+  } else {
+    secAcc.style.display = 'block';
+    secPlace.style.display = 'none';
+  }
+
+  var link = document.getElementById('show-register-link');
+  if (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      secAcc.style.display = 'block';
+      secPrompt.style.display = 'none';
+      secPlace.style.display = 'none';
     });
-  }).then(function(){
-    document.getElementById((type==='ettermek'?'e':'t') + '-success').classList.add('show');
-    btn.disabled = false; btn.textContent = 'Regisztráció →';
-    // reset
-    document.querySelectorAll('#rform-' + type + ' input, #rform-' + type + ' textarea').forEach(function(el){ el.value = ''; el.classList.remove('invalid'); });
-    stops = []; renderStops();
-  }).catch(function(e){
-    btn.disabled = false; btn.textContent = 'Regisztráció →';
-    alert(e.message === 'Failed to fetch' ? 'A szerver nem érhető el.' : (e.message || 'Hiba történt.'));
+  }
+
+  // Tab váltás
+  document.querySelectorAll('#place-tabs [role="tab"]').forEach(function(t) {
+    t.addEventListener('click', function() {
+      document.querySelectorAll('#place-tabs [role="tab"]').forEach(function(b) { b.setAttribute('aria-selected', 'false'); });
+      t.setAttribute('aria-selected', 'true');
+      document.querySelectorAll('.place-form').forEach(function(f) { f.hidden = true; });
+      document.getElementById(t.getAttribute('data-target')).hidden = false;
+    });
   });
-}
+
+  // Regisztráció
+  document.getElementById('btn-acc-reg').addEventListener('click', function() {
+    var name = document.getElementById('acc-name').value.trim();
+    var email = document.getElementById('acc-email').value.trim();
+    var pass = document.getElementById('acc-pass').value;
+    var role = document.getElementById('acc-role').value;
+    var msg = document.getElementById('reg-msg');
+
+    if (!name || !email || !pass) {
+      msg.style.display = 'block'; msg.textContent = 'Minden mező kitöltése kötelező!'; return;
+    }
+
+    fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nev: name, email: email, jelszo: pass, szerep: role })
+    })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+    .then(function(res) {
+      if (!res.ok) { msg.style.display = 'block'; msg.textContent = res.j.error || 'Hiba a regisztráció során.'; return; }
+      localStorage.setItem('fp_user', JSON.stringify(res.j.user));
+      window.location.reload();
+    })
+    .catch(function() {
+      var users = JSON.parse(localStorage.getItem('fp_users') || '[]');
+      if (users.find(function(u) { return u.email === email; })) {
+        msg.style.display = 'block'; msg.textContent = 'Ez az email már regisztrálva van.'; return;
+      }
+      var newUser = { id: Date.now(), nev: name, email: email, jelszo: pass, szerep: role };
+      users.push(newUser);
+      localStorage.setItem('fp_users', JSON.stringify(users));
+      localStorage.setItem('fp_user', JSON.stringify(newUser));
+      window.location.reload();
+    });
+  });
+
+  // Hely feltöltés logika
+  function submitPlace(payload) {
+    if (!payload.nev || !payload.helyszin) { alert('A név és a helyszín kitöltése kötelező!'); return; }
+
+    fetch('/api/helyek', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+    .then(function(res) {
+      if (!res.ok) { alert(res.j.error || 'Hiba történt.'); return; }
+      alert('Sikeresen feltöltve!');
+      window.location.href = 'helyek.html';
+    })
+    .catch(function() {
+      var places = JSON.parse(localStorage.getItem('fp_places') || '[]');
+      payload.id = 'db_' + Date.now(); payload.regisztralt = 1; payload.tulajdonos_id = user.id;
+      places.push(payload);
+      localStorage.setItem('fp_places', JSON.stringify(places));
+      alert('Sikeresen feltöltve! (Demó)');
+      window.location.href = 'helyek.html';
+    });
+  }
+
+  document.getElementById('btn-add-ettermek').addEventListener('click', function() {
+    if (!user) return;
+    submitPlace({
+      cat: 'ettermek', nev: document.getElementById('e-name').value.trim(), helyszin: document.getElementById('e-where').value.trim(),
+      megye: document.getElementById('e-county').value, leiras: document.getElementById('e-desc').value.trim()
+    });
+  });
+
+  document.getElementById('btn-add-truck').addEventListener('click', function() {
+    if (!user) return;
+    submitPlace({
+      cat: 'trucks', nev: document.getElementById('t-name').value.trim(), helyszin: document.getElementById('t-where').value.trim(),
+      megye: document.getElementById('t-county').value, leiras: document.getElementById('t-desc').value.trim(),
+      pin: document.getElementById('t-pin').value, now: document.getElementById('t-now').value.trim()
+    });
+  });
+
+  document.getElementById('btn-add-tuz').addEventListener('click', function() {
+    if (!user) return;
+    submitPlace({
+      cat: 'tuz', nev: document.getElementById('tz-name').value.trim(), helyszin: document.getElementById('tz-where').value.trim(),
+      megye: document.getElementById('tz-county').value, leiras: document.getElementById('tz-desc').value.trim()
+    });
+  });
+})();
 </script>
 </body>
 </html>
